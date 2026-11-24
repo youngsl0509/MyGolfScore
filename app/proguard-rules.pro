@@ -1,0 +1,2 @@
+-keepattributes *Annotation*
+-keepclassmembers class com.mygolfscore.app.data.model.** { *; }

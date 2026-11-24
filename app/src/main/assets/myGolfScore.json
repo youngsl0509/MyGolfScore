@@ -1,0 +1,2063 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-11-23T22:08:00+09:00",
+  "player": "임영석",
+  "driveConfig": {
+    "rootFolderId": "1_zoAQx3O_ydAIryb6s00z_Bh-gzGbqvz",
+    "imageFolderId": "1KbhKnGiyqpZUQR3ArsnHxu7JoUg3ZiD6",
+    "jsonFileName": "myGolfScore.json"
+  },
+  "summary": {
+    "overall": {
+      "totalRounds": 12,
+      "avgStrokes": 94.7,
+      "avgToPar": 22.7,
+      "recent5AvgStrokes": 94.4,
+      "bestScore": 90
+    },
+    "currentYear": {
+      "year": 2026,
+      "totalRounds": 11,
+      "avgStrokes": 94.6,
+      "avgToPar": 22.6,
+      "bestScore": 90
+    },
+    "scoreDistribution": {
+      "birdie": 1,
+      "par": 43,
+      "bogey": 90,
+      "doubleBogey": 65,
+      "triplePlus": 17
+    }
+  },
+  "rounds": [
+    {
+      "id": "2026-10-29_YJC GC",
+      "date": "2026-10-29",
+      "time": "08:49",
+      "courseName": "YJC GC",
+      "player": "임영석",
+      "frontCourseName": "CHALLENGE",
+      "backCourseName": "DREAM",
+      "parTotal": 72,
+      "frontStrokes": 53,
+      "backStrokes": 43,
+      "totalStrokes": 96,
+      "toPar": 24,
+      "source": "G Lounge",
+      "imageFileName": "20261029_YJC GC.jpg",
+      "distribution": {
+        "birdie": 1,
+        "par": 3,
+        "bogey": 8,
+        "doubleBogey": 3,
+        "triplePlus": 3
+      },
+      "holes": [
+        {
+          "hole": 1,
+          "course": "CHALLENGE",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 2,
+          "course": "CHALLENGE",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 3,
+          "course": "CHALLENGE",
+          "par": 5,
+          "strokes": 9,
+          "toPar": 4,
+          "result": "트리플+"
+        },
+        {
+          "hole": 4,
+          "course": "CHALLENGE",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 5,
+          "course": "CHALLENGE",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 6,
+          "course": "CHALLENGE",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 7,
+          "course": "CHALLENGE",
+          "par": 4,
+          "strokes": 7,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 8,
+          "course": "CHALLENGE",
+          "par": 4,
+          "strokes": 8,
+          "toPar": 4,
+          "result": "트리플+"
+        },
+        {
+          "hole": 9,
+          "course": "CHALLENGE",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 10,
+          "course": "DREAM",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 11,
+          "course": "DREAM",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 12,
+          "course": "DREAM",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 13,
+          "course": "DREAM",
+          "par": 3,
+          "strokes": 2,
+          "toPar": -1,
+          "result": "버디"
+        },
+        {
+          "hole": 14,
+          "course": "DREAM",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 15,
+          "course": "DREAM",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 16,
+          "course": "DREAM",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 17,
+          "course": "DREAM",
+          "par": 3,
+          "strokes": 3,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 18,
+          "course": "DREAM",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-17_화성상록 GC",
+      "date": "2026-10-17",
+      "time": "07:05",
+      "courseName": "화성상록 GC",
+      "player": "임영석",
+      "frontCourseName": "남",
+      "backCourseName": "동",
+      "parTotal": 72,
+      "frontStrokes": 46,
+      "backStrokes": 49,
+      "totalStrokes": 95,
+      "toPar": 23,
+      "source": "SMARTSCORE",
+      "imageFileName": "20261017_화성상록 GC.png",
+      "distribution": {
+        "birdie": 0,
+        "par": 4,
+        "bogey": 7,
+        "doubleBogey": 5,
+        "triplePlus": 2
+      },
+      "holes": [
+        {
+          "hole": 1,
+          "course": "남",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 2,
+          "course": "남",
+          "par": 5,
+          "strokes": 8,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 3,
+          "course": "남",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 4,
+          "course": "남",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 5,
+          "course": "남",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 6,
+          "course": "남",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 7,
+          "course": "남",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 8,
+          "course": "남",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 9,
+          "course": "남",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 10,
+          "course": "동",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 11,
+          "course": "동",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 12,
+          "course": "동",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 13,
+          "course": "동",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 14,
+          "course": "동",
+          "par": 4,
+          "strokes": 7,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 15,
+          "course": "동",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 16,
+          "course": "동",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 17,
+          "course": "동",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 18,
+          "course": "동",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        }
+      ]
+    },
+    {
+      "id": "2026-09-18_뉴데이 CC",
+      "date": "2026-09-18",
+      "time": "08:26",
+      "courseName": "뉴데이 CC",
+      "player": "임영석",
+      "frontCourseName": "Vision",
+      "backCourseName": "Dream",
+      "parTotal": 72,
+      "frontStrokes": 47,
+      "backStrokes": 48,
+      "totalStrokes": 95,
+      "toPar": 23,
+      "source": "SMARTSCORE",
+      "imageFileName": "20260918_뉴데이 CC.png",
+      "distribution": {
+        "birdie": 0,
+        "par": 3,
+        "bogey": 7,
+        "doubleBogey": 8,
+        "triplePlus": 0
+      },
+      "holes": [
+        {
+          "hole": 1,
+          "course": "Vision",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 2,
+          "course": "Vision",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 3,
+          "course": "Vision",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 4,
+          "course": "Vision",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 5,
+          "course": "Vision",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 6,
+          "course": "Vision",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 7,
+          "course": "Vision",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 8,
+          "course": "Vision",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 9,
+          "course": "Vision",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 10,
+          "course": "Dream",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 11,
+          "course": "Dream",
+          "par": 5,
+          "strokes": 5,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 12,
+          "course": "Dream",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 13,
+          "course": "Dream",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 14,
+          "course": "Dream",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 15,
+          "course": "Dream",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 16,
+          "course": "Dream",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 17,
+          "course": "Dream",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 18,
+          "course": "Dream",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        }
+      ]
+    },
+    {
+      "id": "2026-08-21_화성상록 GC",
+      "date": "2026-08-21",
+      "time": "06:39",
+      "courseName": "화성상록 GC",
+      "player": "임영석",
+      "frontCourseName": "서",
+      "backCourseName": "남",
+      "parTotal": 72,
+      "frontStrokes": 49,
+      "backStrokes": 44,
+      "totalStrokes": 93,
+      "toPar": 21,
+      "source": "SMARTSCORE",
+      "imageFileName": "20260821_화성상록 GC.png",
+      "distribution": {
+        "birdie": 0,
+        "par": 4,
+        "bogey": 7,
+        "doubleBogey": 7,
+        "triplePlus": 0
+      },
+      "holes": [
+        {
+          "hole": 1,
+          "course": "서",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 2,
+          "course": "서",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 3,
+          "course": "서",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 4,
+          "course": "서",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 5,
+          "course": "서",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 6,
+          "course": "서",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 7,
+          "course": "서",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 8,
+          "course": "서",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 9,
+          "course": "서",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 10,
+          "course": "남",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 11,
+          "course": "남",
+          "par": 5,
+          "strokes": 5,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 12,
+          "course": "남",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 13,
+          "course": "남",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 14,
+          "course": "남",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 15,
+          "course": "남",
+          "par": 3,
+          "strokes": 3,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 16,
+          "course": "남",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 17,
+          "course": "남",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 18,
+          "course": "남",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        }
+      ]
+    },
+    {
+      "id": "2026-06-19_설악 썬밸리",
+      "date": "2026-06-19",
+      "time": "13:31",
+      "courseName": "설악 썬밸리",
+      "player": "임영석",
+      "frontCourseName": "설악",
+      "backCourseName": "썬",
+      "parTotal": 72,
+      "frontStrokes": 48,
+      "backStrokes": 45,
+      "totalStrokes": 93,
+      "toPar": 21,
+      "source": "SMARTSCORE",
+      "imageFileName": "20260619_설악 썬밸리.png",
+      "distribution": {
+        "birdie": 0,
+        "par": 4,
+        "bogey": 8,
+        "doubleBogey": 5,
+        "triplePlus": 1
+      },
+      "holes": [
+        {
+          "hole": 1,
+          "course": "설악",
+          "par": 4,
+          "strokes": 7,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 2,
+          "course": "설악",
+          "par": 5,
+          "strokes": 5,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 3,
+          "course": "설악",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 4,
+          "course": "설악",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 5,
+          "course": "설악",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 6,
+          "course": "설악",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 7,
+          "course": "설악",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 8,
+          "course": "설악",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 9,
+          "course": "설악",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 10,
+          "course": "썬",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 11,
+          "course": "썬",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 12,
+          "course": "썬",
+          "par": 3,
+          "strokes": 3,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 13,
+          "course": "썬",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 14,
+          "course": "썬",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 15,
+          "course": "썬",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 16,
+          "course": "썬",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 17,
+          "course": "썬",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 18,
+          "course": "썬",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        }
+      ]
+    },
+    {
+      "id": "2026-06-18_설악 썬밸리",
+      "date": "2026-06-18",
+      "time": "13:17",
+      "courseName": "설악 썬밸리",
+      "player": "임영석",
+      "frontCourseName": "썬",
+      "backCourseName": "밸리",
+      "parTotal": 72,
+      "frontStrokes": 54,
+      "backStrokes": 48,
+      "totalStrokes": 102,
+      "toPar": 30,
+      "source": "SMARTSCORE",
+      "imageFileName": "20260618_설악 썬밸리.png",
+      "distribution": {
+        "birdie": 0,
+        "par": 3,
+        "bogey": 4,
+        "doubleBogey": 7,
+        "triplePlus": 4
+      },
+      "holes": [
+        {
+          "hole": 1,
+          "course": "썬",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 2,
+          "course": "썬",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 3,
+          "course": "썬",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 4,
+          "course": "썬",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 5,
+          "course": "썬",
+          "par": 4,
+          "strokes": 7,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 6,
+          "course": "썬",
+          "par": 5,
+          "strokes": 8,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 7,
+          "course": "썬",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 8,
+          "course": "썬",
+          "par": 3,
+          "strokes": 3,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 9,
+          "course": "썬",
+          "par": 5,
+          "strokes": 8,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 10,
+          "course": "밸리",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 11,
+          "course": "밸리",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 12,
+          "course": "밸리",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 13,
+          "course": "밸리",
+          "par": 3,
+          "strokes": 6,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 14,
+          "course": "밸리",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 15,
+          "course": "밸리",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 16,
+          "course": "밸리",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 17,
+          "course": "밸리",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 18,
+          "course": "밸리",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        }
+      ]
+    },
+    {
+      "id": "2026-06-13_화성상록 GC",
+      "date": "2026-06-13",
+      "time": "09:47",
+      "courseName": "화성상록 GC",
+      "player": "임영석",
+      "frontCourseName": "동",
+      "backCourseName": "서",
+      "parTotal": 72,
+      "frontStrokes": 47,
+      "backStrokes": 53,
+      "totalStrokes": 100,
+      "toPar": 28,
+      "source": "SMARTSCORE",
+      "imageFileName": "20260613_화성상록 GC.png",
+      "distribution": {
+        "birdie": 0,
+        "par": 3,
+        "bogey": 6,
+        "doubleBogey": 5,
+        "triplePlus": 4
+      },
+      "holes": [
+        {
+          "hole": 1,
+          "course": "동",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 2,
+          "course": "동",
+          "par": 4,
+          "strokes": 7,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 3,
+          "course": "동",
+          "par": 3,
+          "strokes": 3,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 4,
+          "course": "동",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 5,
+          "course": "동",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 6,
+          "course": "동",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 7,
+          "course": "동",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 8,
+          "course": "동",
+          "par": 5,
+          "strokes": 8,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 9,
+          "course": "동",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 10,
+          "course": "서",
+          "par": 4,
+          "strokes": 7,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 11,
+          "course": "서",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 12,
+          "course": "서",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 13,
+          "course": "서",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 14,
+          "course": "서",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 15,
+          "course": "서",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 16,
+          "course": "서",
+          "par": 5,
+          "strokes": 8,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 17,
+          "course": "서",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 18,
+          "course": "서",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        }
+      ]
+    },
+    {
+      "id": "2026-06_글렌로스",
+      "date": "2026-06",
+      "time": "",
+      "courseName": "글렌로스",
+      "player": "임영석",
+      "frontCourseName": "전반전",
+      "backCourseName": "후반전",
+      "parTotal": 72,
+      "frontStrokes": 49,
+      "backStrokes": 43,
+      "totalStrokes": 92,
+      "toPar": 20,
+      "source": "마이스코어",
+      "imageFileName": "202606_글렌로스.png",
+      "distribution": {
+        "birdie": 0,
+        "par": 5,
+        "bogey": 8,
+        "doubleBogey": 3,
+        "triplePlus": 2
+      },
+      "holes": [
+        {
+          "hole": 1,
+          "course": "전반전",
+          "par": 5,
+          "strokes": 5,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 2,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 3,
+          "course": "전반전",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 4,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 5,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 6,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 7,
+          "course": "전반전",
+          "par": 3,
+          "strokes": 6,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 8,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 7,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 9,
+          "course": "전반전",
+          "par": 5,
+          "strokes": 5,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 10,
+          "course": "후반전",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 11,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 12,
+          "course": "후반전",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 13,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 14,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 15,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 16,
+          "course": "후반전",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 17,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 18,
+          "course": "후반전",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        }
+      ]
+    },
+    {
+      "id": "2026-05_글렌로스",
+      "date": "2026-05",
+      "time": "",
+      "courseName": "글렌로스",
+      "player": "임영석",
+      "frontCourseName": "전반전",
+      "backCourseName": "후반전",
+      "parTotal": 72,
+      "frontStrokes": 44,
+      "backStrokes": 46,
+      "totalStrokes": 90,
+      "toPar": 18,
+      "source": "마이스코어",
+      "imageFileName": "202605_글렌로스.png",
+      "distribution": {
+        "birdie": 0,
+        "par": 6,
+        "bogey": 7,
+        "doubleBogey": 4,
+        "triplePlus": 1
+      },
+      "holes": [
+        {
+          "hole": 1,
+          "course": "전반전",
+          "par": 5,
+          "strokes": 5,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 2,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 3,
+          "course": "전반전",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 4,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 5,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 6,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 7,
+          "course": "전반전",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 8,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 9,
+          "course": "전반전",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 10,
+          "course": "후반전",
+          "par": 5,
+          "strokes": 5,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 11,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 12,
+          "course": "후반전",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 13,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 14,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 15,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 7,
+          "toPar": 3,
+          "result": "트리플+"
+        },
+        {
+          "hole": 16,
+          "course": "후반전",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 17,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 18,
+          "course": "후반전",
+          "par": 5,
+          "strokes": 5,
+          "toPar": 0,
+          "result": "파"
+        }
+      ]
+    },
+    {
+      "id": "2026-03-14_천안상록 CC",
+      "date": "2026-03-14",
+      "time": "06:56",
+      "courseName": "천안상록 CC",
+      "player": "임영석",
+      "frontCourseName": "남",
+      "backCourseName": "동",
+      "parTotal": 72,
+      "frontStrokes": 44,
+      "backStrokes": 49,
+      "totalStrokes": 93,
+      "toPar": 21,
+      "source": "SMARTSCORE",
+      "imageFileName": "20260314_천안상록 CC.png",
+      "distribution": {
+        "birdie": 0,
+        "par": 3,
+        "bogey": 9,
+        "doubleBogey": 6,
+        "triplePlus": 0
+      },
+      "holes": [
+        {
+          "hole": 1,
+          "course": "남",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 2,
+          "course": "남",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 3,
+          "course": "남",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 4,
+          "course": "남",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 5,
+          "course": "남",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 6,
+          "course": "남",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 7,
+          "course": "남",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 8,
+          "course": "남",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 9,
+          "course": "남",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 10,
+          "course": "동",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 11,
+          "course": "동",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 12,
+          "course": "동",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 13,
+          "course": "동",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 14,
+          "course": "동",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 15,
+          "course": "동",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 16,
+          "course": "동",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 17,
+          "course": "동",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 18,
+          "course": "동",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        }
+      ]
+    },
+    {
+      "id": "2026-03_글렌로스",
+      "date": "2026-03",
+      "time": "",
+      "courseName": "글렌로스",
+      "player": "임영석",
+      "frontCourseName": "전반전",
+      "backCourseName": "후반전",
+      "parTotal": 72,
+      "frontStrokes": 45,
+      "backStrokes": 47,
+      "totalStrokes": 92,
+      "toPar": 20,
+      "source": "마이스코어",
+      "imageFileName": "202603_글렌로스.png",
+      "distribution": {
+        "birdie": 0,
+        "par": 2,
+        "bogey": 12,
+        "doubleBogey": 4,
+        "triplePlus": 0
+      },
+      "holes": [
+        {
+          "hole": 1,
+          "course": "전반전",
+          "par": 5,
+          "strokes": 5,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 2,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 3,
+          "course": "전반전",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 4,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 5,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 6,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 7,
+          "course": "전반전",
+          "par": 3,
+          "strokes": 3,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 8,
+          "course": "전반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 9,
+          "course": "전반전",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 10,
+          "course": "후반전",
+          "par": 5,
+          "strokes": 6,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 11,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 12,
+          "course": "후반전",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 13,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 14,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 15,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 16,
+          "course": "후반전",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 17,
+          "course": "후반전",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 18,
+          "course": "후반전",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        }
+      ]
+    },
+    {
+      "id": "2025-09-12_리베라컨트리클럽",
+      "date": "2025-09-12",
+      "time": "06:28",
+      "courseName": "리베라컨트리클럽",
+      "player": "임영석",
+      "frontCourseName": "체리힐",
+      "backCourseName": "파인힐",
+      "parTotal": 72,
+      "frontStrokes": 50,
+      "backStrokes": 45,
+      "totalStrokes": 95,
+      "toPar": 23,
+      "source": "SMARTSCORE",
+      "imageFileName": "20250912_리베라컨트리클럽.png",
+      "distribution": {
+        "birdie": 0,
+        "par": 3,
+        "bogey": 7,
+        "doubleBogey": 8,
+        "triplePlus": 0
+      },
+      "holes": [
+        {
+          "hole": 1,
+          "course": "체리힐",
+          "par": 4,
+          "strokes": 4,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 2,
+          "course": "체리힐",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 3,
+          "course": "체리힐",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 4,
+          "course": "체리힐",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 5,
+          "course": "체리힐",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 6,
+          "course": "체리힐",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 7,
+          "course": "체리힐",
+          "par": 4,
+          "strokes": 6,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 8,
+          "course": "체리힐",
+          "par": 3,
+          "strokes": 4,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 9,
+          "course": "체리힐",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 10,
+          "course": "파인힐",
+          "par": 5,
+          "strokes": 7,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 11,
+          "course": "파인힐",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 12,
+          "course": "파인힐",
+          "par": 3,
+          "strokes": 3,
+          "toPar": 0,
+          "result": "파"
+        },
+        {
+          "hole": 13,
+          "course": "파인힐",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 14,
+          "course": "파인힐",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 15,
+          "course": "파인힐",
+          "par": 3,
+          "strokes": 5,
+          "toPar": 2,
+          "result": "더블보기"
+        },
+        {
+          "hole": 16,
+          "course": "파인힐",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 17,
+          "course": "파인힐",
+          "par": 4,
+          "strokes": 5,
+          "toPar": 1,
+          "result": "보기"
+        },
+        {
+          "hole": 18,
+          "course": "파인힐",
+          "par": 5,
+          "strokes": 5,
+          "toPar": 0,
+          "result": "파"
+        }
+      ]
+    }
+  ]
+}
