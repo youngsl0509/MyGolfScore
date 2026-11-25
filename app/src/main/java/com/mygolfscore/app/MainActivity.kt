@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -49,6 +50,7 @@ import com.mygolfscore.app.ui.theme.MyGolfScoreTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             MyGolfScoreTheme {
                 MyGolfScoreApp()
@@ -108,8 +110,8 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .statusBarsPadding()
-                        .height(48.dp)
-                        .padding(horizontal = 14.dp),
+                        .height(56.dp)
+                        .padding(horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -120,21 +122,21 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                         Surface(
                             color = GolfAccent.copy(alpha = 0.25f),
                             shape = CircleShape,
-                            modifier = Modifier.size(26.dp)
+                            modifier = Modifier.size(28.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     Icons.Default.GolfCourse,
                                     contentDescription = null,
                                     tint = GolfAccent,
-                                    modifier = Modifier.size(15.dp)
+                                    modifier = Modifier.size(16.dp)
                                 )
                             }
                         }
                         Text(
                             text = "My Golf Score",
                             fontWeight = FontWeight.Black,
-                            fontSize = 17.sp,
+                            fontSize = 18.sp,
                             color = Color.White
                         )
                     }
@@ -192,15 +194,12 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
             Surface(
                 color = Color.White,
                 shadowElevation = 6.dp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 NavigationBar(
-                    containerColor = Color.Transparent,
+                    containerColor = Color.White,
                     tonalElevation = 0.dp,
-                    windowInsets = WindowInsets(0, 0, 0, 0),
-                    modifier = Modifier.height(52.dp)
+                    windowInsets = NavigationBarDefaults.windowInsets
                 ) {
                     NavigationBarItem(
                         selected = selectedTab == 0,
@@ -208,8 +207,8 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                             viewModel.selectRound(null)
                             selectedTab = 0
                         },
-                        icon = { Icon(Icons.Default.Assessment, contentDescription = null, modifier = Modifier.size(20.dp)) },
-                        label = { Text("요약", fontSize = 11.sp, fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal) },
+                        icon = { Icon(Icons.Default.Assessment, contentDescription = null, modifier = Modifier.size(22.dp)) },
+                        label = { Text("요약", fontSize = 12.sp, fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = GolfDarkEmerald,
                             selectedTextColor = GolfDarkEmerald,
@@ -219,8 +218,8 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                     NavigationBarItem(
                         selected = selectedTab == 1,
                         onClick = { selectedTab = 1 },
-                        icon = { Icon(Icons.AutoMirrored.Filled.FormatListBulleted, contentDescription = null, modifier = Modifier.size(20.dp)) },
-                        label = { Text("기록", fontSize = 11.sp, fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal) },
+                        icon = { Icon(Icons.AutoMirrored.Filled.FormatListBulleted, contentDescription = null, modifier = Modifier.size(22.dp)) },
+                        label = { Text("기록", fontSize = 12.sp, fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = GolfDarkEmerald,
                             selectedTextColor = GolfDarkEmerald,
@@ -233,8 +232,8 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                             viewModel.selectRound(null)
                             selectedTab = 2
                         },
-                        icon = { Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(20.dp)) },
-                        label = { Text("업로드", fontSize = 11.sp, fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal) },
+                        icon = { Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(22.dp)) },
+                        label = { Text("업로드", fontSize = 12.sp, fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = GolfDarkEmerald,
                             selectedTextColor = GolfDarkEmerald,
@@ -247,8 +246,8 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                             viewModel.selectRound(null)
                             selectedTab = 3
                         },
-                        icon = { Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(20.dp)) },
-                        label = { Text("설정", fontSize = 11.sp, fontWeight = if (selectedTab == 3) FontWeight.Bold else FontWeight.Normal) },
+                        icon = { Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(22.dp)) },
+                        label = { Text("설정", fontSize = 12.sp, fontWeight = if (selectedTab == 3) FontWeight.Bold else FontWeight.Normal) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = GolfDarkEmerald,
                             selectedTextColor = GolfDarkEmerald,

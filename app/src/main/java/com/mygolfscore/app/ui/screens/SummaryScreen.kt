@@ -34,7 +34,7 @@ import kotlin.math.max
 fun SummaryScreen(
     payload: GolfScorePayload,
     isUsingOfflineSample: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val overall = payload.summary.overall
     val yearly = payload.summary.currentYear
