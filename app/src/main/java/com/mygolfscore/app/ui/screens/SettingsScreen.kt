@@ -302,7 +302,7 @@ fun SettingsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text("애플리케이션", fontSize = 13.sp, color = Color.Gray)
-                    Text("My Golf Score", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = GolfDarkEmerald)
+                    Text("MyScore", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = GolfDarkEmerald)
                 }
 
                 Row(

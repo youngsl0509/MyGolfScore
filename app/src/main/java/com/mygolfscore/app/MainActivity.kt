@@ -164,7 +164,7 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                             }
                         }
                         Text(
-                            text = "My Golf Score",
+                            text = "MyScore",
                             fontWeight = FontWeight.Black,
                             fontSize = 18.sp,
                             color = Color.White
