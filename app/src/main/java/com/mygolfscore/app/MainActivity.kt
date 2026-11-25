@@ -7,7 +7,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -24,8 +27,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,9 +47,9 @@ import com.mygolfscore.app.ui.screens.SettingsScreen
 import com.mygolfscore.app.ui.screens.SummaryScreen
 import com.mygolfscore.app.ui.screens.UploadScreen
 import com.mygolfscore.app.ui.theme.GolfAccent
+import com.mygolfscore.app.ui.theme.GolfAppIconGreen
 import com.mygolfscore.app.ui.theme.GolfDarkEmerald
 import com.mygolfscore.app.ui.theme.GolfGreenLight
-import com.mygolfscore.app.ui.theme.GolfSurface
 import com.mygolfscore.app.ui.theme.MyGolfScoreTheme
 
 class MainActivity : ComponentActivity() {
@@ -64,6 +69,7 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val signInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
@@ -77,6 +83,29 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                 viewModel.onGoogleSignInFailed("코드 ${e.statusCode}")
             }
         }
+    }
+
+    val consentLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        viewModel.onAuthConsentResult(result.resultCode == Activity.RESULT_OK)
+    }
+
+    LaunchedEffect(state.authConsentIntent) {
+        val intent = state.authConsentIntent ?: return@LaunchedEffect
+        try {
+            consentLauncher.launch(intent)
+        } catch (_: Throwable) {
+            viewModel.onAuthConsentResult(false)
+        } finally {
+            viewModel.consumeAuthConsentIntent()
+        }
+    }
+
+    LaunchedEffect(state.statusMessage) {
+        val msg = state.statusMessage ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(msg, duration = SnackbarDuration.Short)
+        viewModel.clearStatusMessage()
     }
 
     fun launchGoogleSignIn() {
@@ -98,11 +127,12 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
     }
 
     Scaffold(
-        containerColor = GolfSurface,
+        containerColor = Color.White,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             // Status bar background extends into status bar; text/buttons sit safely below status bar
             Surface(
-                color = GolfDarkEmerald,
+                color = GolfAppIconGreen,
                 shadowElevation = 3.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -120,7 +150,7 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Surface(
-                            color = GolfAccent.copy(alpha = 0.25f),
+                            color = Color.White.copy(alpha = 0.2f),
                             shape = CircleShape,
                             modifier = Modifier.size(28.dp)
                         ) {
@@ -128,7 +158,7 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                                 Icon(
                                     Icons.Default.GolfCourse,
                                     contentDescription = null,
-                                    tint = GolfAccent,
+                                    tint = Color.White,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
@@ -170,7 +200,7 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                         } else {
                             Button(
                                 onClick = { launchGoogleSignIn() },
-                                colors = ButtonDefaults.buttonColors(containerColor = GolfAccent),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                                 shape = RoundedCornerShape(16.dp),
                                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp),
                                 modifier = Modifier.height(30.dp)
@@ -190,70 +220,61 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
             }
         },
         bottomBar = {
-            // Navigation bar background extends to screen edge; tabs sit cleanly above gesture bar
+            // Navigation bar background extends to screen edge; tabs sit cleanly above device navigation bar
             Surface(
                 color = Color.White,
                 shadowElevation = 6.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                NavigationBar(
-                    containerColor = Color.White,
-                    tonalElevation = 0.dp,
-                    windowInsets = NavigationBarDefaults.windowInsets
-                ) {
-                    NavigationBarItem(
-                        selected = selectedTab == 0,
-                        onClick = {
-                            viewModel.selectRound(null)
-                            selectedTab = 0
-                        },
-                        icon = { Icon(Icons.Default.Assessment, contentDescription = null, modifier = Modifier.size(22.dp)) },
-                        label = { Text("요약", fontSize = 12.sp, fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = GolfDarkEmerald,
-                            selectedTextColor = GolfDarkEmerald,
-                            indicatorColor = GolfGreenLight
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    HorizontalDivider(color = Color(0xFFE2E8F0), thickness = 0.5.dp)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(58.dp)
+                            .padding(horizontal = 4.dp)
+                            .selectableGroup(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CompactBottomTabItem(
+                            selected = selectedTab == 0,
+                            onClick = {
+                                viewModel.selectRound(null)
+                                selectedTab = 0
+                            },
+                            icon = Icons.Default.Assessment,
+                            label = "요약",
+                            modifier = Modifier.weight(1f)
                         )
-                    )
-                    NavigationBarItem(
-                        selected = selectedTab == 1,
-                        onClick = { selectedTab = 1 },
-                        icon = { Icon(Icons.AutoMirrored.Filled.FormatListBulleted, contentDescription = null, modifier = Modifier.size(22.dp)) },
-                        label = { Text("기록", fontSize = 12.sp, fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = GolfDarkEmerald,
-                            selectedTextColor = GolfDarkEmerald,
-                            indicatorColor = GolfGreenLight
+                        CompactBottomTabItem(
+                            selected = selectedTab == 1,
+                            onClick = { selectedTab = 1 },
+                            icon = Icons.AutoMirrored.Filled.FormatListBulleted,
+                            label = "기록",
+                            modifier = Modifier.weight(1f)
                         )
-                    )
-                    NavigationBarItem(
-                        selected = selectedTab == 2,
-                        onClick = {
-                            viewModel.selectRound(null)
-                            selectedTab = 2
-                        },
-                        icon = { Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(22.dp)) },
-                        label = { Text("업로드", fontSize = 12.sp, fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = GolfDarkEmerald,
-                            selectedTextColor = GolfDarkEmerald,
-                            indicatorColor = GolfGreenLight
+                        CompactBottomTabItem(
+                            selected = selectedTab == 2,
+                            onClick = {
+                                viewModel.selectRound(null)
+                                selectedTab = 2
+                            },
+                            icon = Icons.Default.CloudUpload,
+                            label = "업로드",
+                            modifier = Modifier.weight(1f)
                         )
-                    )
-                    NavigationBarItem(
-                        selected = selectedTab == 3,
-                        onClick = {
-                            viewModel.selectRound(null)
-                            selectedTab = 3
-                        },
-                        icon = { Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(22.dp)) },
-                        label = { Text("설정", fontSize = 12.sp, fontWeight = if (selectedTab == 3) FontWeight.Bold else FontWeight.Normal) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = GolfDarkEmerald,
-                            selectedTextColor = GolfDarkEmerald,
-                            indicatorColor = GolfGreenLight
+                        CompactBottomTabItem(
+                            selected = selectedTab == 3,
+                            onClick = {
+                                viewModel.selectRound(null)
+                                selectedTab = 3
+                            },
+                            icon = Icons.Default.Settings,
+                            label = "설정",
+                            modifier = Modifier.weight(1f)
                         )
-                    )
+                    }
+                    Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
                 }
             }
         }
@@ -322,5 +343,53 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CompactBottomTabItem(
+    selected: Boolean,
+    onClick: () -> Unit,
+    icon: ImageVector,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    val contentColor = if (selected) GolfDarkEmerald else Color(0xFF64748B)
+    Column(
+        modifier = modifier
+            .fillMaxHeight()
+            .clip(RoundedCornerShape(10.dp))
+            .selectable(
+                selected = selected,
+                onClick = onClick,
+                role = Role.Tab
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .width(52.dp)
+                .height(26.dp)
+                .clip(RoundedCornerShape(13.dp))
+                .background(if (selected) GolfGreenLight else Color.Transparent),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = contentColor,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = label,
+            fontSize = 11.sp,
+            lineHeight = 13.sp,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+            color = contentColor,
+            maxLines = 1
+        )
     }
 }

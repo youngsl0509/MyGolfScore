@@ -1,14 +1,19 @@
 package com.mygolfscore.app.ui
 
 import android.app.Application
+import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.mygolfscore.app.data.drive.GoogleDriveRepository
+import com.mygolfscore.app.data.drive.NeedAuthConsentException
 import com.mygolfscore.app.data.model.GolfRound
 import com.mygolfscore.app.data.model.GolfScorePayload
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,11 +33,21 @@ data class GolfScoreUiState(
     val selectedImageUri: Uri? = null,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
+    val authConsentIntent: Intent? = null,
 )
 
 class GolfScoreViewModel(application: Application) : AndroidViewModel(application) {
 
+    private enum class ConsentPendingAction {
+        SYNC,
+        UPLOAD
+    }
+
     private val repository = GoogleDriveRepository(application.applicationContext)
+    private var syncJob: Job? = null
+    private var uploadJob: Job? = null
+    private var authCleanupJob: Job? = null
+    private var pendingConsentAction: ConsentPendingAction? = null
 
     private val _uiState = MutableStateFlow(GolfScoreUiState())
     val uiState: StateFlow<GolfScoreUiState> = _uiState.asStateFlow()
@@ -57,6 +72,7 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun onGoogleSignInSuccess(account: GoogleSignInAccount) {
+        pendingConsentAction = null
         _uiState.update {
             it.copy(
                 isSignedIn = true,
@@ -64,6 +80,7 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
                 accountDisplayName = account.displayName,
                 accountPhotoUrl = account.photoUrl?.toString(),
                 errorMessage = null,
+                authConsentIntent = null,
                 statusMessage = "구글 계정 연결됨 (${account.email})"
             )
         }
@@ -71,6 +88,16 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun onGoogleSignOutSuccess() {
+        val prevSync = syncJob
+        syncJob = null
+        prevSync?.cancel()
+
+        val prevUpload = uploadJob
+        uploadJob = null
+        prevUpload?.cancel()
+
+        pendingConsentAction = null
+
         val sample = runCatching { repository.loadLocalSample() }.getOrDefault(GolfScorePayload())
         _uiState.update {
             it.copy(
@@ -79,11 +106,23 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
                 accountDisplayName = null,
                 accountPhotoUrl = null,
                 isUsingOfflineSample = true,
+                isLoading = false,
+                isUploading = false,
                 payload = sample,
                 selectedRound = null,
                 selectedImageUri = null,
+                errorMessage = null,
+                authConsentIntent = null,
                 statusMessage = "로그아웃되었습니다."
             )
+        }
+
+        val prevCleanup = authCleanupJob
+        authCleanupJob = viewModelScope.launch {
+            prevCleanup?.join()
+            prevSync?.join()
+            prevUpload?.join()
+            repository.clearCache()
         }
     }
 
@@ -94,7 +133,7 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun refreshFromDrive() {
-        if (_uiState.value.isLoading) return
+        if (_uiState.value.isLoading || syncJob?.isActive == true) return
         val account = GoogleSignIn.getLastSignedInAccount(getApplication())
         if (account == null) {
             _uiState.update { it.copy(errorMessage = "먼저 구글 계정으로 로그인해 주세요.") }
@@ -105,30 +144,55 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
 
     private fun syncFromDrive(account: GoogleSignInAccount) {
         val gAccount = account.account ?: return
-        if (_uiState.value.isLoading) return
-        viewModelScope.launch {
+        if (_uiState.value.isLoading || syncJob?.isActive == true) return
+
+        lateinit var job: Job
+        job = viewModelScope.launch(start = CoroutineStart.LAZY) {
+            authCleanupJob?.join()
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            runCatching {
-                val token = repository.fetchAccessToken(gAccount)
-                repository.downloadScoreJson(token).getOrThrow()
-            }.onSuccess { downloaded ->
+            try {
+                val result = repository.downloadScoreJson(gAccount).getOrThrow()
+                val msg = if (result.fromCache) {
+                    "이미 최신 상태입니다 (${result.payload.rounds.size}경기)"
+                } else {
+                    "구글 드라이브 최신 데이터 동기화 완료 (${result.payload.rounds.size}경기)"
+                }
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         isUsingOfflineSample = false,
-                        payload = downloaded,
-                        statusMessage = "구글 드라이브 최신 데이터 동기화 완료 (${downloaded.rounds.size}경기)"
+                        payload = result.payload,
+                        statusMessage = msg
                     )
                 }
-            }.onFailure { err ->
+            } catch (ce: CancellationException) {
+                if (syncJob === job) {
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+                throw ce
+            } catch (consent: NeedAuthConsentException) {
+                pendingConsentAction = ConsentPendingAction.SYNC
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        authConsentIntent = consent.consentIntent
+                    )
+                }
+            } catch (err: Throwable) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         errorMessage = err.message ?: "드라이브 동기화 중 오류가 발생했습니다."
                     )
                 }
+            } finally {
+                if (syncJob === job) {
+                    syncJob = null
+                }
             }
         }
+        syncJob = job
+        job.start()
     }
 
     fun selectRound(round: GolfRound?) {
@@ -140,19 +204,20 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun uploadSelectedImage() {
-        if (_uiState.value.isUploading) return
+        if (_uiState.value.isUploading || uploadJob?.isActive == true) return
         val uri = _uiState.value.selectedImageUri ?: return
         val account = GoogleSignIn.getLastSignedInAccount(getApplication())?.account
         if (account == null) {
             _uiState.update { it.copy(errorMessage = "업로드하려면 먼저 구글 계정으로 로그인해 주세요.") }
             return
         }
-        viewModelScope.launch {
+
+        lateinit var job: Job
+        job = viewModelScope.launch(start = CoroutineStart.LAZY) {
+            authCleanupJob?.join()
             _uiState.update { it.copy(isUploading = true, errorMessage = null, statusMessage = null) }
-            runCatching {
-                val token = repository.fetchAccessToken(account)
-                repository.uploadScorecardImage(token, uri).getOrThrow()
-            }.onSuccess { uploadedName ->
+            try {
+                val uploadedName = repository.uploadScorecardImage(account, uri).getOrThrow()
                 _uiState.update {
                     it.copy(
                         isUploading = false,
@@ -160,15 +225,58 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
                         statusMessage = "GolfScore/Image 폴더에 업로드 완료: $uploadedName"
                     )
                 }
-            }.onFailure { err ->
+            } catch (ce: CancellationException) {
+                if (uploadJob === job) {
+                    _uiState.update { it.copy(isUploading = false) }
+                }
+                throw ce
+            } catch (consent: NeedAuthConsentException) {
+                pendingConsentAction = ConsentPendingAction.UPLOAD
+                _uiState.update {
+                    it.copy(
+                        isUploading = false,
+                        authConsentIntent = consent.consentIntent
+                    )
+                }
+            } catch (err: Throwable) {
                 _uiState.update {
                     it.copy(
                         isUploading = false,
                         errorMessage = err.message ?: "업로드 중 오류가 발생했습니다."
                     )
                 }
+            } finally {
+                if (uploadJob === job) {
+                    uploadJob = null
+                }
             }
         }
+        uploadJob = job
+        job.start()
+    }
+
+    fun consumeAuthConsentIntent() {
+        _uiState.update { it.copy(authConsentIntent = null) }
+    }
+
+    fun onAuthConsentResult(granted: Boolean) {
+        val action = pendingConsentAction
+        pendingConsentAction = null
+        if (!granted) {
+            _uiState.update {
+                it.copy(errorMessage = "Google Drive 권한 승인이 취소되었습니다.")
+            }
+            return
+        }
+        when (action) {
+            ConsentPendingAction.SYNC -> refreshFromDrive()
+            ConsentPendingAction.UPLOAD -> uploadSelectedImage()
+            null -> Unit
+        }
+    }
+
+    fun clearStatusMessage() {
+        _uiState.update { it.copy(statusMessage = null) }
     }
 
     fun clearMessages() {

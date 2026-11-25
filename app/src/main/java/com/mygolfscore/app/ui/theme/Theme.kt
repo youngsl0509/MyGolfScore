@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 val GolfDarkEmerald = Color(0xFF0A2E23)
 val GolfGreenDark = Color(0xFF104E3B)
 val GolfGreenMid = Color(0xFF1B6B52)
+val GolfAppIconGreen = Color(0xFF14A665)
 val GolfGreenLight = Color(0xFFE6F4EE)
 val GolfAccent = Color(0xFF10B981)
 val GoldAccent = Color(0xFFF59E0B)
@@ -31,7 +32,7 @@ private val GolfColorScheme = lightColorScheme(
     onPrimaryContainer = GolfDarkEmerald,
     secondary = GolfGreenMid,
     onSecondary = Color.White,
-    background = GolfSurface,
+    background = Color.White,
     surface = Color.White,
     surfaceVariant = Color(0xFFEAEFF0),
     onSurfaceVariant = Color(0xFF334155)
