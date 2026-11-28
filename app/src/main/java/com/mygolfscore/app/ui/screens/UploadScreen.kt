@@ -45,21 +45,23 @@ fun UploadScreen(
     isUploading: Boolean,
     onSelectImage: (Uri?) -> Unit,
     onUploadClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    var showInfoDialog by remember { mutableStateOf(value = false) }
+    var showInfoDialog by remember { mutableStateOf(false) }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
+        contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
-        uri?.let { onSelectImage(it) }
+        if (uri != null) {
+            onSelectImage(uri)
+        }
     }
 
     fun launchPicker() {
         if (!isUploading) {
             photoPickerLauncher.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
             )
         }
     }
@@ -73,7 +75,7 @@ fun UploadScreen(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
                 text = "스코어카드 업로드",
@@ -83,7 +85,7 @@ fun UploadScreen(
             )
             IconButton(
                 onClick = { showInfoDialog = true },
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(28.dp)
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Info,
@@ -130,19 +132,17 @@ fun UploadScreen(
                                 .padding(6.dp)
                         )
                         if (!isUploading) {
-                            IconButton(
-                                onClick = { onSelectImage(null) },
+                            Surface(
+                                color = Color.Black.copy(alpha = 0.58f),
+                                shape = CircleShape,
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
-                                    .padding(4.dp)
-                                    .size(48.dp)
+                                    .padding(10.dp)
+                                    .size(34.dp)
                             ) {
-                                Box(
-                                    contentAlignment = Alignment.Center,
-                                    modifier = Modifier
-                                        .size(34.dp)
-                                        .clip(CircleShape)
-                                        .background(Color.Black.copy(alpha = 0.58f))
+                                IconButton(
+                                    onClick = { onSelectImage(null) },
+                                    modifier = Modifier.fillMaxSize()
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
@@ -173,7 +173,7 @@ fun UploadScreen(
                             Text(
                                 text = if (fileSizeText.isNotBlank()) "$fileSizeText · 업로드 준비 완료" else "업로드 준비 완료",
                                 fontSize = 12.sp,
-                                color = MintText,
+                                color = BrandPrimary,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -254,7 +254,7 @@ fun UploadScreen(
             }
         }
 
-        val uploadEnabled = isSignedIn && (selectedImageUri != null) && !isUploading
+        val uploadEnabled = isSignedIn && selectedImageUri != null && !isUploading
         Button(
             onClick = onUploadClick,
             enabled = uploadEnabled,
@@ -369,7 +369,7 @@ private fun resolveImageMeta(context: Context, uri: Uri): Pair<String, String> {
     }
     val sizeText = when {
         sizeBytes <= 0L -> ""
-        (sizeBytes < (1024L * 1024L)) -> "${sizeBytes / 1024L} KB"
+        sizeBytes < 1024L * 1024L -> "${sizeBytes / 1024L} KB"
         else -> String.format(Locale.getDefault(), "%.1f MB", sizeBytes / (1024.0 * 1024.0))
     }
     return name to sizeText

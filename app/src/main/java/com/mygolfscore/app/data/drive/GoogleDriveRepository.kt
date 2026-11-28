@@ -312,12 +312,87 @@ class GoogleDriveRepository(private val context: Context) {
     }
 
 
-    suspend fun downloadImageBytes(
+    suspend fun downloadRoundImageBytes(
         account: Account,
-        fileId: String
+        fileId: String,
+        fileName: String
     ): Result<ByteArray> = withContext(Dispatchers.IO) {
         try {
-            val downloadUrl = "https://www.googleapis.com/drive/v3/files/$fileId?alt=media"
+            val resolvedId = if (fileId.isNotBlank()) {
+                fileId
+            } else {
+                val escapedFolderId = DEFAULT_CONFIG.imageFolderId.replace("\\", "\\\\").replace("'", "\\'")
+                val escapedName = fileName.replace("\\", "\\\\").replace("'", "\\'")
+                val query = "'$escapedFolderId' in parents and name='$escapedName' and trashed=false"
+                val searchUrl = "https://www.googleapis.com/drive/v3/files" +
+                    "?q=${Uri.encode(query)}&pageSize=1&fields=files(id)"
+                executeWithAuthAndRetry(
+                    account = account,
+                    buildRequest = { token ->
+                        Request.Builder()
+                            .url(searchUrl)
+                            .addHeader("Authorization", "Bearer $token")
+                            .get()
+                            .build()
+                    },
+                    parseResponse = { resp ->
+                        if (!resp.isSuccessful) error("이미지 검색 실패 (${resp.code})")
+                        val bodyStr = resp.body?.string().orEmpty()
+                        val files = jsonParser.parseToJsonElement(bodyStr).jsonObject["files"]?.jsonArray
+                        if (files.isNullOrEmpty()) error("Drive에서 원본 이미지($fileName)를 찾을 수 없습니다.")
+                        files[0].jsonObject["id"]?.jsonPrimitive?.content ?: error("이미지 ID를 읽을 수 없습니다.")
+                    }
+                )
+            }
+            downloadImageBytes(account, resolvedId).getOrThrow().let { Result.success(it) }
+        } catch (ce: CancellationException) {
+            throw ce
+        } catch (t: Throwable) {
+            Result.failure(t)
+        }
+    }
+
+    suspend fun downloadImageBytes(
+        account: Account,
+        fileId: String,
+        fileName: String = "",
+        imageFolderId: String = DEFAULT_CONFIG.imageFolderId
+    ): Result<ByteArray> = withContext(Dispatchers.IO) {
+        try {
+            val resolvedFileId = if (fileId.isNotBlank()) {
+                fileId
+            } else {
+                if (fileName.isBlank()) error("연결된 원본 스코어카드 이미지가 없습니다.")
+                val escapedFolderId = imageFolderId.replace("\\", "\\\\").replace("'", "\\'")
+                val escapedFileName = fileName.replace("\\", "\\\\").replace("'", "\\'")
+                val query = "'$escapedFolderId' in parents and name='$escapedFileName' and trashed=false"
+                val searchUrl = "https://www.googleapis.com/drive/v3/files" +
+                    "?q=${Uri.encode(query)}&orderBy=modifiedTime%20desc&pageSize=1&fields=files(id,name)"
+                executeWithAuthAndRetry(
+                    account = account,
+                    buildRequest = { token ->
+                        Request.Builder()
+                            .url(searchUrl)
+                            .addHeader("Authorization", "Bearer $token")
+                            .get()
+                            .build()
+                    },
+                    parseResponse = { resp ->
+                        if (!resp.isSuccessful) {
+                            error("원본 이미지 검색 실패 (${resp.code})")
+                        }
+                        val bodyStr = resp.body?.string().orEmpty()
+                        val files = jsonParser.parseToJsonElement(bodyStr).jsonObject["files"]?.jsonArray
+                        if (files.isNullOrEmpty()) {
+                            error("GolfScore/Image 폴더에서 '$fileName' 파일을 찾을 수 없습니다.")
+                        }
+                        files[0].jsonObject["id"]?.jsonPrimitive?.content
+                            ?: error("원본 이미지 ID를 읽을 수 없습니다.")
+                    }
+                )
+            }
+
+            val downloadUrl = "https://www.googleapis.com/drive/v3/files/$resolvedFileId?alt=media"
             val bytes = executeWithAuthAndRetry(
                 account = account,
                 buildRequest = { token ->

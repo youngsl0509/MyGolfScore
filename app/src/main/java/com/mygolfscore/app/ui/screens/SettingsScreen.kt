@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,16 +35,9 @@ fun SettingsScreen(
     onSignInClick: () -> Unit,
     onSignOutClick: () -> Unit,
     onRefreshClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val appVersion = remember(context) {
-        runCatching {
-            @Suppress("DEPRECATION")
-            context.packageManager.getPackageInfo(context.packageName, 0).versionName
-        }.getOrNull()?.takeIf { it.isNotBlank() } ?: "1.1.0"
-    }
-    var showLogoutDialog by remember { mutableStateOf(value = false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -53,7 +45,7 @@ fun SettingsScreen(
             .background(GolfSurface)
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
         Text(
             text = "설정 및 동기화",
@@ -134,14 +126,14 @@ fun SettingsScreen(
                                     Icon(
                                         Icons.Default.CheckCircle,
                                         contentDescription = null,
-                                        tint = MintText,
+                                        tint = BrandPrimary,
                                         modifier = Modifier.size(14.dp)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = "Google Drive 연결됨",
                                         fontSize = 12.sp,
-                                        color = MintText,
+                                        color = BrandPrimary,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
@@ -158,7 +150,7 @@ fun SettingsScreen(
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(48.dp)
+                                .height(44.dp)
                         ) {
                             Icon(
                                 Icons.AutoMirrored.Filled.Logout,
@@ -175,7 +167,7 @@ fun SettingsScreen(
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(48.dp)
+                                .height(46.dp)
                         ) {
                             Text("Google 계정으로 로그인", fontWeight = FontWeight.Bold)
                         }
@@ -246,7 +238,7 @@ fun SettingsScreen(
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(48.dp)
+                                .height(44.dp)
                         ) {
                             Icon(
                                 Icons.Default.Refresh,
@@ -297,7 +289,7 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text("버전", fontSize = 13.sp, color = TextSecondary)
-                        Text("v$appVersion", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = GolfDarkEmerald)
+                        Text("v1.0.0", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = GolfDarkEmerald)
                     }
                 }
             }

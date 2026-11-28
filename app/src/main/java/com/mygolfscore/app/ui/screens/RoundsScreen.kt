@@ -1,6 +1,10 @@
 package com.mygolfscore.app.ui.screens
 
 import android.graphics.BitmapFactory
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,12 +22,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.RotateRight
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.FitScreen
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PieChart
-import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.outlined.RemoveCircleOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,8 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.zIndex
 import com.mygolfscore.app.data.model.GolfRound
 import com.mygolfscore.app.data.model.HoleScore
 import com.mygolfscore.app.ui.theme.*
@@ -52,25 +55,25 @@ import kotlin.math.roundToInt
 fun RoundsListScreen(
     rounds: List<GolfRound>,
     onSelectRound: (GolfRound) -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     val years = remember(rounds) {
-        rounds.asSequence().mapNotNull { round ->
+        rounds.mapNotNull { round ->
             val y = round.date.take(4)
-            if ((y.length == 4) && y.all { it.isDigit() }) y else null
-        }.distinct().sortedDescending().toList()
+            if (y.length == 4 && y.all { it.isDigit() }) y else null
+        }.distinct().sortedDescending()
     }
     var selectedYear by remember { mutableStateOf("전체") }
 
     LaunchedEffect(years) {
-        if ((selectedYear != "전체") && (selectedYear !in years)) {
+        if (selectedYear != "전체" && selectedYear !in years) {
             selectedYear = "전체"
         }
     }
 
     val filteredRounds = remember(rounds, selectedYear) {
         if (selectedYear == "전체") rounds
-        else rounds.filter { round -> round.date.startsWith(selectedYear) }
+        else rounds.filter { it.date.startsWith(selectedYear) }
     }
 
     val filterOptions = remember(years) { listOf("전체") + years }
@@ -80,7 +83,7 @@ fun RoundsListScreen(
             .fillMaxSize()
             .background(GolfSurface)
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Spacer(modifier = Modifier.height(4.dp))
 
@@ -133,7 +136,7 @@ fun RoundsListScreen(
                 contentPadding = PaddingValues(bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(filteredRounds, key = { round -> round.id }) { round ->
+                items(filteredRounds, key = { it.id }) { round ->
                     RoundSummaryCard(
                         round = round,
                         onClick = { onSelectRound(round) }
@@ -183,7 +186,6 @@ private fun RoundSummaryCard(
                 )
 
                 val subCourses = listOf(round.frontCourseName, round.backCourseName)
-                    .asSequence()
                     .filter { it.isNotBlank() }
                     .joinToString(" / ")
                 if (subCourses.isNotBlank()) {
@@ -240,35 +242,37 @@ private fun RoundSummaryCard(
 @Composable
 fun RoundDetailScreen(
     round: GolfRound,
-    isViewerOpen: Boolean,
     isLoadingImage: Boolean,
-    viewingImageBytes: ByteArray?,
-    imageErrorMessage: String?,
     onBack: () -> Unit,
     onViewOriginalImage: () -> Unit,
-    onDismissOriginalImage: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val hasOriginalImage = round.imageFileId.isNotBlank()
+    val pillGreen = Color(0xFF059669)
+    val pillBg = Color(0xFFECFDF5)
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(GolfSurface)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // 상단 서브 헤더: 좌측 ← 라운드 목록 + 우측 원본 이미지 필 버튼 (v1.0.1)
+        // 상단 서브 헤더: 좌측 ← 라운드 목록 + 우측 원본 이미지 필 버튼 (최소 터치 영역 48dp)
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 48.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
                 modifier = Modifier
-                    .heightIn(min = 48.dp)
+                    .defaultMinSize(minHeight = 48.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .clickable(onClick = onBack)
-                    .padding(horizontal = 4.dp, vertical = 8.dp),
+                    .padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
@@ -286,29 +290,38 @@ fun RoundDetailScreen(
                 )
             }
 
-            if (round.imageFileId.isNotBlank()) {
-                OutlinedButton(
-                    onClick = onViewOriginalImage,
-                    shape = CircleShape,
-                    border = BorderStroke(1.dp, ViewerPillBorder),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = ViewerPillBg,
-                        contentColor = ViewerPillBorder
-                    ),
-                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
-                    modifier = Modifier.heightIn(min = 48.dp)
+            if (hasOriginalImage) {
+                Box(
+                    modifier = Modifier
+                        .defaultMinSize(minHeight = 48.dp)
+                        .clip(CircleShape)
+                        .clickable(enabled = !isLoadingImage, onClick = onViewOriginalImage),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Image,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "원본 이미지",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Surface(
+                        color = pillBg,
+                        shape = CircleShape,
+                        border = BorderStroke(1.dp, pillGreen)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(5.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Image,
+                                contentDescription = null,
+                                tint = pillGreen,
+                                modifier = Modifier.size(15.dp)
+                            )
+                            Text(
+                                text = "원본 이미지",
+                                fontSize = 12.5.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = pillGreen
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -333,18 +346,15 @@ fun RoundDetailScreen(
             )
         }
 
-        if (round.holes.isNotEmpty()) {
-            RoundScoreStatisticsCard(round.holes)
-        }
-
-        if (round.imageFileId.isNotBlank()) {
+        if (hasOriginalImage) {
             OutlinedButton(
                 onClick = onViewOriginalImage,
+                enabled = !isLoadingImage,
                 shape = RoundedCornerShape(14.dp),
-                border = BorderStroke(1.dp, BrandPrimary),
+                border = BorderStroke(1.dp, pillGreen),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color.White,
-                    contentColor = BrandPrimary
+                    containerColor = pillBg,
+                    contentColor = pillGreen
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -360,20 +370,12 @@ fun RoundDetailScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        if (round.holes.isNotEmpty()) {
+            RoundScoreStatisticsCard(round.holes)
+        }
     }
 
-    if (isViewerOpen) {
-        OriginalImageViewerDialog(
-            courseName = round.courseName,
-            roundDate = round.date,
-            isLoading = isLoadingImage,
-            imageBytes = viewingImageBytes,
-            errorMessage = imageErrorMessage,
-            onRetry = onViewOriginalImage,
-            onDismiss = onDismissOriginalImage,
-        )
-    }
+
 }
 
 @Composable
@@ -431,7 +433,7 @@ private fun CourseHolesSection(title: String, holes: List<HoleScore>, strokes: I
                 }
 
                 holes.forEachIndexed { index, h ->
-                    val hasScore = (h.strokes > 0) && (h.par > 0)
+                    val hasScore = h.strokes > 0 && h.par > 0
                     val (bg, fg) = when {
                         !hasScore -> Color.Transparent to TextSecondary
                         h.toPar <= -1 -> BirdieBg to BirdieBlue
@@ -512,7 +514,7 @@ private fun CourseHolesSection(title: String, holes: List<HoleScore>, strokes: I
 
 @Composable
 private fun RoundScoreStatisticsCard(holes: List<HoleScore>) {
-    val validHoles = holes.filter { hole -> (hole.strokes > 0) && (hole.par > 0) }
+    val validHoles = holes.filter { it.strokes > 0 && it.par > 0 }
     val totalHoles = max(1, validHoles.size)
     val birdieCount = validHoles.count { it.toPar <= -1 }
     val parCount = validHoles.count { it.toPar == 0 }
@@ -615,59 +617,52 @@ private fun RoundScoreStatisticsCard(holes: List<HoleScore>) {
 }
 
 @Composable
-private fun OriginalImageViewerDialog(
+fun OriginalImageViewerOverlay(
     courseName: String,
-    roundDate: String,
+    date: String,
     isLoading: Boolean,
     imageBytes: ByteArray?,
     errorMessage: String?,
     onRetry: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    BackHandler(onBack = onDismiss)
+
     val bitmap = remember(imageBytes) {
         imageBytes?.let { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() }
     }
-    var scale by remember(imageBytes) { mutableFloatStateOf(1f) }
-    var offsetX by remember(imageBytes) { mutableFloatStateOf(0f) }
-    var offsetY by remember(imageBytes) { mutableFloatStateOf(0f) }
-    var rotationDegrees by remember(imageBytes) { mutableFloatStateOf(0f) }
-    var showOverlays by remember { mutableStateOf(true) }
+    var scale by remember { mutableFloatStateOf(1f) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    var offsetY by remember { mutableFloatStateOf(0f) }
+    var rotation by remember { mutableFloatStateOf(0f) }
+    var showOverlay by remember { mutableStateOf(true) }
 
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false
-        )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0B1117))
+            .zIndex(10f)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(ViewerBackdrop)
-        ) {
             when {
                 isLoading -> {
                     CircularProgressIndicator(
                         color = BrandPrimary,
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier
+                            .size(44.dp)
+                            .align(Alignment.Center)
                     )
                 }
-                errorMessage != null || bitmap == null -> {
+
+                errorMessage != null -> {
                     Column(
                         modifier = Modifier
                             .align(Alignment.Center)
-                            .padding(horizontal = 24.dp),
+                            .padding(horizontal = 28.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.ErrorOutline,
-                            contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.8f),
-                            modifier = Modifier.size(44.dp)
-                        )
                         Text(
-                            text = errorMessage ?: "이미지를 표시할 수 없습니다.",
+                            text = errorMessage,
                             color = Color.White,
                             fontSize = 14.sp,
                             textAlign = TextAlign.Center
@@ -675,28 +670,23 @@ private fun OriginalImageViewerDialog(
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             Button(
                                 onClick = onRetry,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = BrandPrimary,
-                                    contentColor = Color.White
-                                ),
+                                colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary),
                                 shape = CircleShape
                             ) {
-                                Text("다시 시도", fontWeight = FontWeight.Bold)
+                                Text("다시 시도", fontWeight = FontWeight.Bold, color = Color.White)
                             }
                             OutlinedButton(
                                 onClick = onDismiss,
-                                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = Color.White
-                                ),
+                                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.4f)),
                                 shape = CircleShape
                             ) {
-                                Text("닫기", fontWeight = FontWeight.SemiBold)
+                                Text("닫기", fontWeight = FontWeight.SemiBold, color = Color.White)
                             }
                         }
                     }
                 }
-                else -> {
+
+                bitmap != null -> {
                     Image(
                         bitmap = bitmap,
                         contentDescription = "원본 스코어카드 이미지",
@@ -705,7 +695,7 @@ private fun OriginalImageViewerDialog(
                             .fillMaxSize()
                             .pointerInput(Unit) {
                                 detectTapGestures(
-                                    onTap = { showOverlays = !showOverlays },
+                                    onTap = { showOverlay = !showOverlay },
                                     onDoubleTap = {
                                         if (scale > 1.05f) {
                                             scale = 1f
@@ -735,174 +725,184 @@ private fun OriginalImageViewerDialog(
                                 scaleY = scale
                                 translationX = offsetX
                                 translationY = offsetY
-                                rotationZ = rotationDegrees
+                                rotationZ = rotation
                             }
+                    )
+                }
+
+                else -> {
+                    Text(
+                        text = "이미지를 표시할 수 없습니다.",
+                        color = Color.White,
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
             }
 
-            // 상단 오버레이 바
-            if (showOverlays) {
-                Surface(
-                    color = ViewerOverlayBg,
+            // 상단 오버레이 바: rgba(17, 24, 39, 0.80)
+            AnimatedVisibility(
+                visible = showOverlay,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .zIndex(2f)
+            ) {
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .align(Alignment.TopCenter)
+                        .background(Color(0xCC111827))
+                        .statusBarsPadding()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .statusBarsPadding()
-                            .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "원본 스코어카드",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                text = "$courseName · $roundDate",
-                                fontSize = 13.sp,
-                                color = Color.White.copy(alpha = 0.78f),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "원본 스코어카드",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            text = "$courseName · $date",
+                            fontSize = 13.sp,
+                            color = Color(0xFF9CA3AF),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
 
-                        IconButton(
-                            onClick = onDismiss,
-                            modifier = Modifier.size(48.dp)
-                        ) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.White.copy(alpha = 0.16f))
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "닫기",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-                        }
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.14f))
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "닫기",
+                            tint = Color.White
+                        )
                     }
                 }
             }
 
-            // 하단 플로팅 컨트롤 바
-            if (showOverlays && !isLoading && errorMessage == null && bitmap != null) {
+            // 하단 플로팅 컨트롤 바: #1F2937 반투명 캡슐 + 제스처 안내 문구
+            AnimatedVisibility(
+                visible = showOverlay && bitmap != null && !isLoading && errorMessage == null,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .zIndex(2f)
+                    .navigationBarsPadding()
+                    .padding(bottom = 18.dp, start = 16.dp, end = 16.dp)
+            ) {
                 Column(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .navigationBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Surface(
-                        color = ViewerControlBarBg,
+                        color = Color(0xE61F2937),
                         shape = CircleShape,
-                        shadowElevation = 6.dp
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.14f))
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             IconButton(
                                 onClick = {
-                                    val nextScale = (scale - 0.5f).coerceIn(1f, 4f)
-                                    scale = nextScale
-                                    if (nextScale <= 1f) {
+                                    val next = (scale - 0.5f).coerceIn(1f, 4f)
+                                    scale = next
+                                    if (next <= 1f) {
                                         offsetX = 0f
                                         offsetY = 0f
                                     }
                                 },
-                                modifier = Modifier.size(48.dp)
+                                modifier = Modifier.size(42.dp)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Remove,
+                                    imageVector = Icons.Outlined.RemoveCircleOutline,
                                     contentDescription = "축소",
-                                    tint = Color.White
+                                    tint = Color.White,
+                                    modifier = Modifier.size(22.dp)
                                 )
                             }
 
                             Surface(
-                                color = ViewerZoomBadgeBg,
+                                color = Color(0xFF10B981).copy(alpha = 0.18f),
                                 shape = CircleShape
                             ) {
                                 Text(
                                     text = "${(scale * 100f).roundToInt()}%",
-                                    color = Color.White,
-                                    fontSize = 12.sp,
+                                    fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                    color = Color(0xFF10B981),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                                 )
                             }
 
                             IconButton(
-                                onClick = {
-                                    scale = (scale + 0.5f).coerceIn(1f, 4f)
-                                },
-                                modifier = Modifier.size(48.dp)
+                                onClick = { scale = (scale + 0.5f).coerceIn(1f, 4f) },
+                                modifier = Modifier.size(42.dp)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Add,
+                                    imageVector = Icons.Outlined.AddCircleOutline,
                                     contentDescription = "확대",
-                                    tint = Color.White
+                                    tint = Color.White,
+                                    modifier = Modifier.size(22.dp)
                                 )
                             }
 
+                            Box(
+                                modifier = Modifier
+                                    .padding(horizontal = 4.dp)
+                                    .width(1.dp)
+                                    .height(22.dp)
+                                    .background(Color.White.copy(alpha = 0.18f))
+                            )
+
                             IconButton(
-                                onClick = {
-                                    rotationDegrees = (rotationDegrees + 90f) % 360f
-                                },
-                                modifier = Modifier.size(48.dp)
+                                onClick = { rotation = (rotation + 90f) % 360f },
+                                modifier = Modifier.size(42.dp)
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.RotateRight,
                                     contentDescription = "90도 회전",
-                                    tint = Color.White
+                                    tint = Color.White,
+                                    modifier = Modifier.size(22.dp)
                                 )
                             }
 
-                            TextButton(
+                            IconButton(
                                 onClick = {
                                     scale = 1f
                                     offsetX = 0f
                                     offsetY = 0f
-                                    rotationDegrees = 0f
+                                    rotation = 0f
                                 },
-                                modifier = Modifier.heightIn(min = 48.dp)
+                                modifier = Modifier.size(42.dp)
                             ) {
-                                Text(
-                                    text = "1:1",
-                                    color = Color.White,
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold
+                                Icon(
+                                    imageVector = Icons.Default.FitScreen,
+                                    contentDescription = "화면 맞춤 초기화",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(22.dp)
                                 )
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
                     Text(
                         text = "두 손가락으로 확대·이동 · 더블 탭으로 2배 확대",
                         fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.78f),
-                        textAlign = TextAlign.Center
+                        color = Color(0xFF9CA3AF)
                     )
                 }
             }
         }
     }
-}

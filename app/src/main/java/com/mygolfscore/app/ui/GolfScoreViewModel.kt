@@ -25,11 +25,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-enum class RetryAction {
-    SYNC,
-    UPLOAD
-}
-
 data class GolfScoreUiState(
     val isSignedIn: Boolean = false,
     val accountEmail: String? = null,
@@ -43,73 +38,19 @@ data class GolfScoreUiState(
     val selectedImageUri: Uri? = null,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
-    val snackbarActionLabel: String? = null,
-    val snackbarRetryAction: RetryAction? = null,
     val lastSyncedAt: String? = null,
-    val isViewerOpen: Boolean = false,
+    val isImageViewerOpen: Boolean = false,
     val isLoadingRoundImage: Boolean = false,
     val viewingImageBytes: ByteArray? = null,
-    val imageErrorMessage: String? = null,
+    val imageViewerError: String? = null,
     val authConsentIntent: Intent? = null,
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        other as GolfScoreUiState
-        if (isSignedIn != other.isSignedIn) return false
-        if (accountEmail != other.accountEmail) return false
-        if (accountDisplayName != other.accountDisplayName) return false
-        if (accountPhotoUrl != other.accountPhotoUrl) return false
-        if (isUsingOfflineSample != other.isUsingOfflineSample) return false
-        if (isLoading != other.isLoading) return false
-        if (isUploading != other.isUploading) return false
-        if (payload != other.payload) return false
-        if (selectedRound != other.selectedRound) return false
-        if (selectedImageUri != other.selectedImageUri) return false
-        if (statusMessage != other.statusMessage) return false
-        if (errorMessage != other.errorMessage) return false
-        if (snackbarActionLabel != other.snackbarActionLabel) return false
-        if (snackbarRetryAction != other.snackbarRetryAction) return false
-        if (lastSyncedAt != other.lastSyncedAt) return false
-        if (isViewerOpen != other.isViewerOpen) return false
-        if (isLoadingRoundImage != other.isLoadingRoundImage) return false
-        if (!viewingImageBytes.contentEquals(other.viewingImageBytes)) return false
-        if (imageErrorMessage != other.imageErrorMessage) return false
-        if (authConsentIntent != other.authConsentIntent) return false
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = isSignedIn.hashCode()
-        result = 31 * result + (accountEmail?.hashCode() ?: 0)
-        result = 31 * result + (accountDisplayName?.hashCode() ?: 0)
-        result = 31 * result + (accountPhotoUrl?.hashCode() ?: 0)
-        result = 31 * result + isUsingOfflineSample.hashCode()
-        result = 31 * result + isLoading.hashCode()
-        result = 31 * result + isUploading.hashCode()
-        result = 31 * result + payload.hashCode()
-        result = 31 * result + (selectedRound?.hashCode() ?: 0)
-        result = 31 * result + (selectedImageUri?.hashCode() ?: 0)
-        result = 31 * result + (statusMessage?.hashCode() ?: 0)
-        result = 31 * result + (errorMessage?.hashCode() ?: 0)
-        result = 31 * result + (snackbarActionLabel?.hashCode() ?: 0)
-        result = 31 * result + (snackbarRetryAction?.hashCode() ?: 0)
-        result = 31 * result + (lastSyncedAt?.hashCode() ?: 0)
-        result = 31 * result + isViewerOpen.hashCode()
-        result = 31 * result + isLoadingRoundImage.hashCode()
-        result = 31 * result + (viewingImageBytes?.contentHashCode() ?: 0)
-        result = 31 * result + (imageErrorMessage?.hashCode() ?: 0)
-        result = 31 * result + (authConsentIntent?.hashCode() ?: 0)
-        return result
-    }
-}
+)
 
 class GolfScoreViewModel(application: Application) : AndroidViewModel(application) {
 
     private enum class ConsentPendingAction {
         SYNC,
-        UPLOAD,
-        VIEW_IMAGE
+        UPLOAD
     }
 
     private val repository = GoogleDriveRepository(application.applicationContext)
@@ -117,7 +58,6 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
     private var uploadJob: Job? = null
     private var authCleanupJob: Job? = null
     private var pendingConsentAction: ConsentPendingAction? = null
-    private var pendingImageRound: GolfRound? = null
     private var imageJob: Job? = null
 
     private fun currentFormattedTime(): String =
@@ -147,7 +87,6 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun onGoogleSignInSuccess(account: GoogleSignInAccount) {
         pendingConsentAction = null
-        pendingImageRound = null
         _uiState.update {
             it.copy(
                 isSignedIn = true,
@@ -155,8 +94,6 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
                 accountDisplayName = account.displayName,
                 accountPhotoUrl = account.photoUrl?.toString(),
                 errorMessage = null,
-                snackbarActionLabel = null,
-                snackbarRetryAction = null,
                 authConsentIntent = null,
                 statusMessage = "구글 계정 연결됨 (${account.email})"
             )
@@ -173,12 +110,7 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
         uploadJob = null
         prevUpload?.cancel()
 
-        val prevImage = imageJob
-        imageJob = null
-        prevImage?.cancel()
-
         pendingConsentAction = null
-        pendingImageRound = null
 
         val sample = runCatching { repository.loadLocalSample() }.getOrDefault(GolfScorePayload())
         _uiState.update {
@@ -194,13 +126,11 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
                 selectedRound = null,
                 selectedImageUri = null,
                 errorMessage = null,
-                snackbarActionLabel = null,
-                snackbarRetryAction = null,
                 lastSyncedAt = null,
-                isViewerOpen = false,
+                isImageViewerOpen = false,
                 isLoadingRoundImage = false,
                 viewingImageBytes = null,
-                imageErrorMessage = null,
+                imageViewerError = null,
                 authConsentIntent = null,
                 statusMessage = "로그아웃되었습니다."
             )
@@ -211,18 +141,13 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
             prevCleanup?.join()
             prevSync?.join()
             prevUpload?.join()
-            prevImage?.join()
             repository.clearCache()
         }
     }
 
     fun onGoogleSignInFailed(message: String) {
         _uiState.update {
-            it.copy(
-                errorMessage = "로그인 실패: $message",
-                snackbarActionLabel = null,
-                snackbarRetryAction = null
-            )
+            it.copy(errorMessage = "로그인 실패: $message")
         }
     }
 
@@ -230,13 +155,7 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
         if (_uiState.value.isLoading || syncJob?.isActive == true) return
         val account = GoogleSignIn.getLastSignedInAccount(getApplication())
         if (account == null) {
-            _uiState.update {
-                it.copy(
-                    errorMessage = "먼저 구글 계정으로 로그인해 주세요.",
-                    snackbarActionLabel = null,
-                    snackbarRetryAction = null
-                )
-            }
+            _uiState.update { it.copy(errorMessage = "먼저 구글 계정으로 로그인해 주세요.") }
             return
         }
         syncFromDrive(account)
@@ -249,14 +168,7 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
         lateinit var job: Job
         job = viewModelScope.launch(start = CoroutineStart.LAZY) {
             authCleanupJob?.join()
-            _uiState.update {
-                it.copy(
-                    isLoading = true,
-                    errorMessage = null,
-                    snackbarActionLabel = null,
-                    snackbarRetryAction = null
-                )
-            }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 val result = repository.downloadScoreJson(gAccount).getOrThrow()
                 val msg = if (result.fromCache) {
@@ -290,9 +202,7 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = err.message ?: "드라이브 동기화 중 오류가 발생했습니다.",
-                        snackbarActionLabel = "다시 시도",
-                        snackbarRetryAction = RetryAction.SYNC
+                        errorMessage = err.message ?: "드라이브 동기화 중 오류가 발생했습니다."
                     )
                 }
             } finally {
@@ -306,22 +216,11 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun selectRound(round: GolfRound?) {
-        if (round == null) {
-            dismissOriginalScorecardImage()
-        }
         _uiState.update { it.copy(selectedRound = round) }
     }
 
     fun selectImage(uri: Uri?) {
-        _uiState.update {
-            it.copy(
-                selectedImageUri = uri,
-                errorMessage = null,
-                snackbarActionLabel = null,
-                snackbarRetryAction = null,
-                statusMessage = null
-            )
-        }
+        _uiState.update { it.copy(selectedImageUri = uri, errorMessage = null, statusMessage = null) }
     }
 
     fun uploadSelectedImage() {
@@ -329,28 +228,14 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
         val uri = _uiState.value.selectedImageUri ?: return
         val account = GoogleSignIn.getLastSignedInAccount(getApplication())?.account
         if (account == null) {
-            _uiState.update {
-                it.copy(
-                    errorMessage = "업로드하려면 먼저 구글 계정으로 로그인해 주세요.",
-                    snackbarActionLabel = null,
-                    snackbarRetryAction = null
-                )
-            }
+            _uiState.update { it.copy(errorMessage = "업로드하려면 먼저 구글 계정으로 로그인해 주세요.") }
             return
         }
 
         lateinit var job: Job
         job = viewModelScope.launch(start = CoroutineStart.LAZY) {
             authCleanupJob?.join()
-            _uiState.update {
-                it.copy(
-                    isUploading = true,
-                    errorMessage = null,
-                    snackbarActionLabel = null,
-                    snackbarRetryAction = null,
-                    statusMessage = null
-                )
-            }
+            _uiState.update { it.copy(isUploading = true, errorMessage = null, statusMessage = null) }
             try {
                 val uploadedName = repository.uploadScorecardImage(account, uri).getOrThrow()
                 _uiState.update {
@@ -377,9 +262,7 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
                 _uiState.update {
                     it.copy(
                         isUploading = false,
-                        errorMessage = err.message ?: "업로드 중 오류가 발생했습니다.",
-                        snackbarActionLabel = "다시 시도",
-                        snackbarRetryAction = RetryAction.UPLOAD
+                        errorMessage = err.message ?: "업로드 중 오류가 발생했습니다."
                     )
                 }
             } finally {
@@ -398,81 +281,61 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun onAuthConsentResult(granted: Boolean) {
         val action = pendingConsentAction
-        val roundForImage = pendingImageRound
         pendingConsentAction = null
-        pendingImageRound = null
         if (!granted) {
             _uiState.update {
-                if (action == ConsentPendingAction.VIEW_IMAGE) {
-                    it.copy(imageErrorMessage = "Google Drive 권한 승인이 취소되었습니다.")
-                } else {
-                    it.copy(
-                        errorMessage = "Google Drive 권한 승인이 취소되었습니다.",
-                        snackbarActionLabel = null,
-                        snackbarRetryAction = null
-                    )
-                }
+                it.copy(errorMessage = "Google Drive 권한 승인이 취소되었습니다.")
             }
             return
         }
         when (action) {
             ConsentPendingAction.SYNC -> refreshFromDrive()
             ConsentPendingAction.UPLOAD -> uploadSelectedImage()
-            ConsentPendingAction.VIEW_IMAGE -> roundForImage?.let { loadOriginalScorecardImage(it) }
             null -> Unit
         }
     }
 
     fun loadOriginalScorecardImage(round: GolfRound) {
         if (round.imageFileId.isBlank()) {
-            _uiState.update {
-                it.copy(
-                    isViewerOpen = true,
-                    isLoadingRoundImage = false,
-                    viewingImageBytes = null,
-                    imageErrorMessage = "연결된 원본 스코어카드 이미지가 없습니다."
-                )
-            }
+            _uiState.update { it.copy(errorMessage = "연결된 원본 스코어카드 이미지가 없습니다.") }
             return
         }
         val account = GoogleSignIn.getLastSignedInAccount(getApplication())?.account
         if (account == null) {
             _uiState.update {
                 it.copy(
-                    isViewerOpen = true,
+                    isImageViewerOpen = true,
                     isLoadingRoundImage = false,
                     viewingImageBytes = null,
-                    imageErrorMessage = "이미지를 보려면 먼저 로그인해 주세요."
+                    imageViewerError = "이미지를 보려면 먼저 로그인해 주세요."
                 )
             }
             return
         }
         imageJob?.cancel()
-        lateinit var job: Job
-        job = viewModelScope.launch(start = CoroutineStart.LAZY) {
+        imageJob = viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    isViewerOpen = true,
+                    isImageViewerOpen = true,
                     isLoadingRoundImage = true,
                     viewingImageBytes = null,
-                    imageErrorMessage = null
+                    imageViewerError = null
                 )
             }
-            val res = repository.downloadImageBytes(account, round.imageFileId)
+            val res = repository.downloadRoundImageBytes(account, round.imageFileId, round.imageFileName)
             res.onSuccess { bytes ->
                 _uiState.update {
                     it.copy(
                         isLoadingRoundImage = false,
                         viewingImageBytes = bytes,
-                        imageErrorMessage = null
+                        imageViewerError = null
                     )
                 }
             }.onFailure { err ->
                 if (err is NeedAuthConsentException) {
-                    pendingConsentAction = ConsentPendingAction.VIEW_IMAGE
-                    pendingImageRound = round
                     _uiState.update {
                         it.copy(
+                            isImageViewerOpen = false,
                             isLoadingRoundImage = false,
                             authConsentIntent = err.consentIntent
                         )
@@ -481,28 +344,22 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
                     _uiState.update {
                         it.copy(
                             isLoadingRoundImage = false,
-                            imageErrorMessage = err.message ?: "이미지를 불러오지 못했습니다."
+                            imageViewerError = err.message ?: "이미지를 불러오지 못했습니다."
                         )
                     }
                 }
             }
-            if (imageJob === job) {
-                imageJob = null
-            }
         }
-        imageJob = job
-        job.start()
     }
 
     fun dismissOriginalScorecardImage() {
         imageJob?.cancel()
-        imageJob = null
         _uiState.update {
             it.copy(
-                isViewerOpen = false,
+                isImageViewerOpen = false,
                 isLoadingRoundImage = false,
                 viewingImageBytes = null,
-                imageErrorMessage = null
+                imageViewerError = null
             )
         }
     }
@@ -511,13 +368,7 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
         _uiState.update { it.copy(statusMessage = null) }
     }
 
-    fun clearErrorMessage() {
-        _uiState.update {
-            it.copy(
-                errorMessage = null,
-                snackbarActionLabel = null,
-                snackbarRetryAction = null
-            )
-        }
+    fun clearMessages() {
+        _uiState.update { it.copy(statusMessage = null, errorMessage = null) }
     }
 }
