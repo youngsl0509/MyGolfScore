@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MyScore</string>
+    <string name="apps_script_webhook_url" translatable="false">https://script.google.com/macros/s/AKfycbzf4hi_CfqTjfTLlBhqClRz_yEBiXYTXxs4hQWKUxCitnV5f5jkN6gOhO3h69AhcTCQ/exec</string>
+    <string name="apps_script_secret" translatable="false"></string>
 </resources>

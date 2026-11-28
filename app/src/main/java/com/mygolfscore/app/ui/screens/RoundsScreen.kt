@@ -21,13 +21,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.RotateRight
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FitScreen
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material.icons.outlined.RemoveCircleOutline
+import androidx.compose.material.icons.automirrored.filled.RotateRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -58,10 +58,10 @@ fun RoundsListScreen(
     modifier: Modifier = Modifier
 ) {
     val years = remember(rounds) {
-        rounds.mapNotNull { round ->
+        rounds.asSequence().mapNotNull { round ->
             val y = round.date.take(4)
             if (y.length == 4 && y.all { it.isDigit() }) y else null
-        }.distinct().sortedDescending()
+        }.distinct().sortedDescending().toList()
     }
     var selectedYear by remember { mutableStateOf("전체") }
 

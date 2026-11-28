@@ -474,6 +474,46 @@ class GoogleDriveRepository(private val context: Context) {
         }
     }
 
+
+    suspend fun triggerAppsScriptSync(
+        webhookUrl: String,
+        secret: String = ""
+    ): Result<Int> = withContext(Dispatchers.IO) {
+        try {
+            val payloadJson = JSONObject().apply {
+                if (secret.isNotBlank()) put("secret", secret)
+            }.toString()
+
+            val webhookClient = httpClient.newBuilder()
+                .readTimeout(90, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .build()
+
+            val req = Request.Builder()
+                .url(webhookUrl.trim())
+                .post(payloadJson.toRequestBody("application/json; charset=UTF-8".toMediaType()))
+                .build()
+
+            webhookClient.newCall(req).execute().use { resp ->
+                if (!resp.isSuccessful) {
+                    error("자동 분석 호출 실패 (${resp.code})")
+                }
+                val body = resp.body?.string().orEmpty()
+                val json = JSONObject(body)
+                if (!json.optBoolean("ok", false)) {
+                    error(json.optString("error", "Apps Script 처리 실패"))
+                }
+                val resultObj = json.optJSONObject("result")
+                val addedCount = resultObj?.optInt("addedCount", 0) ?: 0
+                Result.success(addedCount)
+            }
+        } catch (ce: CancellationException) {
+            throw ce
+        } catch (t: Throwable) {
+            Result.failure(t)
+        }
+    }
+
     private fun resolveFileName(uri: Uri, mimeType: String): String {
         val rawName = runCatching {
             context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->

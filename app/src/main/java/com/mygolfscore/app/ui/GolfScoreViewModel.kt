@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.mygolfscore.app.R
 import com.mygolfscore.app.data.drive.GoogleDriveRepository
 import com.mygolfscore.app.data.drive.NeedAuthConsentException
 import com.mygolfscore.app.data.model.GolfRound
@@ -25,6 +26,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@Suppress("ArrayInDataClass")
 data class GolfScoreUiState(
     val isSignedIn: Boolean = false,
     val accountEmail: String? = null,
@@ -238,12 +240,45 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
             _uiState.update { it.copy(isUploading = true, errorMessage = null, statusMessage = null) }
             try {
                 val uploadedName = repository.uploadScorecardImage(account, uri).getOrThrow()
-                _uiState.update {
-                    it.copy(
-                        isUploading = false,
-                        selectedImageUri = null,
-                        statusMessage = "GolfScore/Image 폴더에 업로드 완료: $uploadedName"
+                val appCtx = getApplication<Application>()
+                val webhookUrl = appCtx.getString(R.string.apps_script_webhook_url).trim()
+                val webhookSecret = appCtx.getString(R.string.apps_script_secret).trim()
+
+                if (webhookUrl.isNotBlank()) {
+                    _uiState.update {
+                        it.copy(
+                            selectedImageUri = null,
+                            statusMessage = "업로드 완료! 자동 스코어 분석 중..."
+                        )
+                    }
+                    val syncRes = repository.triggerAppsScriptSync(webhookUrl, webhookSecret)
+                    val refreshed = repository.downloadScoreJson(account, forceRefresh = true)
+                    val finalMsg = syncRes.fold(
+                        onSuccess = { added ->
+                            if (added > 0) "업로드 및 자동 반영 완료 (신규 ${added}경기)"
+                            else "업로드 완료 (기존 기록과 중복되거나 분석 대기)"
+                        },
+                        onFailure = { err ->
+                            "업로드는 완료되었으나 자동 분석에 실패했습니다: ${err.message}"
+                        }
                     )
+                    _uiState.update { stateNow ->
+                        val newPayload = refreshed.getOrNull()?.payload ?: stateNow.payload
+                        stateNow.copy(
+                            isUploading = false,
+                            payload = newPayload,
+                            lastSyncedAt = if (refreshed.isSuccess) currentFormattedTime() else stateNow.lastSyncedAt,
+                            statusMessage = finalMsg
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isUploading = false,
+                            selectedImageUri = null,
+                            statusMessage = "GolfScore/Image 폴더에 업로드 완료: $uploadedName"
+                        )
+                    }
                 }
             } catch (ce: CancellationException) {
                 if (uploadJob === job) {
@@ -366,9 +401,5 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun clearStatusMessage() {
         _uiState.update { it.copy(statusMessage = null) }
-    }
-
-    fun clearMessages() {
-        _uiState.update { it.copy(statusMessage = null, errorMessage = null) }
     }
 }
