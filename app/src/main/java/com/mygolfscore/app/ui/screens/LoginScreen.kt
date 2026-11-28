@@ -22,7 +22,7 @@ fun LoginScreen(
     isLoading: Boolean,
     errorMessage: String?,
     onSignInClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
