@@ -9,6 +9,8 @@ import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.filled.GolfCourse
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,20 +23,29 @@ import com.mygolfscore.app.ui.theme.*
 fun LoginScreen(
     isLoading: Boolean,
     errorMessage: String?,
+    onErrorShown: () -> Unit,
     onSignInClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(GolfSurface)
-            .systemBarsPadding()
-            .padding(horizontal = 24.dp),
-    ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(errorMessage) {
+        val msg = errorMessage?.takeIf { it.isNotBlank() } ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(msg, duration = SnackbarDuration.Short)
+        onErrorShown()
+    }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = GolfSurface,
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 32.dp),
+                .background(GolfSurface)
+                .padding(innerPadding)
+                .padding(horizontal = 24.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -72,23 +83,6 @@ fun LoginScreen(
                 fontSize = 14.sp,
                 color = TextSecondary,
             )
-
-            if (!errorMessage.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(20.dp))
-                Surface(
-                    color = TripleBg,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        text = errorMessage,
-                        color = DestructiveRed,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                    )
-                }
-            }
 
             Spacer(modifier = Modifier.weight(1f))
 

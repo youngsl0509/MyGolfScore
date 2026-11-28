@@ -30,6 +30,14 @@ val HairlineDivider = Color(0xFFE5E7EB)
 val DestructiveRed = Color(0xFFDC2626)
 val DestructiveBorder = Color(0xFFFCA5A5)
 
+// Original Scorecard Image Viewer Tokens (v1.0.1)
+val ViewerBackdrop = Color(0xFF0B0F17)
+val ViewerOverlayBg = Color(0xCC111827)
+val ViewerControlBarBg = Color(0xE61F2937)
+val ViewerZoomBadgeBg = Color(0xFF10B981)
+val ViewerPillBorder = Color(0xFF059669)
+val ViewerPillBg = Color(0xFFECFDF5)
+
 // 5-tier Score Semantics
 val BirdieBlue = Color(0xFF2563EB)
 val BirdieBg = Color(0xFFEFF6FF)

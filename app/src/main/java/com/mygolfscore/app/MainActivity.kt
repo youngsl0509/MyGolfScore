@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.mygolfscore.app
 
 import android.app.Activity
@@ -23,10 +25,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.GolfCourse
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.rounded.Home
@@ -51,6 +53,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
 import com.mygolfscore.app.ui.GolfScoreViewModel
+import com.mygolfscore.app.ui.RetryAction
 import com.mygolfscore.app.ui.screens.LoginScreen
 import com.mygolfscore.app.ui.screens.RoundDetailScreen
 import com.mygolfscore.app.ui.screens.RoundsListScreen
@@ -90,6 +93,8 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
             } catch (e: ApiException) {
                 viewModel.onGoogleSignInFailed("코드 ${e.statusCode}")
             }
+        } else {
+            viewModel.onGoogleSignInFailed("Google 로그인이 취소되었습니다.")
         }
     }
 
@@ -116,6 +121,26 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
         viewModel.clearStatusMessage()
     }
 
+    LaunchedEffect(state.isSignedIn, state.errorMessage, state.snackbarActionLabel, state.snackbarRetryAction) {
+        if (!state.isSignedIn) return@LaunchedEffect
+        val err = state.errorMessage ?: return@LaunchedEffect
+        val actionLabel = state.snackbarActionLabel
+        val retryAction = state.snackbarRetryAction
+        val result = snackbarHostState.showSnackbar(
+            message = err,
+            actionLabel = actionLabel,
+            duration = if (actionLabel != null) SnackbarDuration.Long else SnackbarDuration.Short
+        )
+        viewModel.clearErrorMessage()
+        if (result == SnackbarResult.ActionPerformed) {
+            when (retryAction) {
+                RetryAction.SYNC -> viewModel.refreshFromDrive()
+                RetryAction.UPLOAD -> viewModel.uploadSelectedImage()
+                null -> Unit
+            }
+        }
+    }
+
     fun launchGoogleSignIn() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
@@ -139,12 +164,13 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
         LoginScreen(
             isLoading = state.isLoading,
             errorMessage = state.errorMessage,
+            onErrorShown = { viewModel.clearErrorMessage() },
             onSignInClick = { launchGoogleSignIn() }
         )
         return
     }
 
-    BackHandler(enabled = selectedTab == 1 && state.selectedRound != null) {
+    BackHandler(enabled = selectedTab == 1 && state.selectedRound != null && !state.isViewerOpen) {
         viewModel.selectRound(null)
     }
 
@@ -173,7 +199,7 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                         .fillMaxWidth()
                         .statusBarsPadding()
                         .height(56.dp)
-                        .padding(horizontal = 16.dp),
+                        .padding(start = 16.dp, end = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -198,50 +224,56 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
                         Text(
                             text = "MyScore",
                             fontWeight = FontWeight.Black,
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                             color = Color.White
                         )
                     }
 
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
                             onClick = { viewModel.refreshFromDrive() },
-                            modifier = Modifier.size(36.dp)
+                            modifier = Modifier.size(48.dp)
                         ) {
                             Icon(
                                 Icons.Default.Refresh,
                                 contentDescription = "새로고침",
                                 tint = Color.White,
                                 modifier = Modifier
-                                    .size(20.dp)
+                                    .size(22.dp)
                                     .graphicsLayer {
                                         rotationZ = if (state.isLoading) refreshRotation else 0f
                                     }
                             )
                         }
                         if (!state.accountPhotoUrl.isNullOrEmpty()) {
-                            AsyncImage(
-                                model = state.accountPhotoUrl,
-                                contentDescription = "프로필 (설정으로 이동)",
-                                contentScale = ContentScale.Crop,
+                            Box(
+                                contentAlignment = Alignment.Center,
                                 modifier = Modifier
-                                    .size(32.dp)
+                                    .size(48.dp)
                                     .clip(CircleShape)
                                     .clickable {
                                         viewModel.selectRound(null)
                                         selectedTab = 3
                                     }
-                            )
+                            ) {
+                                AsyncImage(
+                                    model = state.accountPhotoUrl,
+                                    contentDescription = "프로필 (설정으로 이동)",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                )
+                            }
                         } else {
                             IconButton(
                                 onClick = {
                                     viewModel.selectRound(null)
                                     selectedTab = 3
                                 },
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(48.dp)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.AccountCircle,
@@ -314,64 +346,54 @@ fun MyGolfScoreApp(viewModel: GolfScoreViewModel = viewModel()) {
             }
         }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            state.errorMessage?.let { err ->
-                Surface(
-                    color = TripleBg,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = err,
-                        color = DestructiveRed,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                    )
-                }
-            }
-
-            Box(modifier = Modifier.fillMaxSize()) {
-                when (selectedTab) {
-                    0 -> SummaryScreen(
-                        payload = state.payload,
-                        isUsingOfflineSample = state.isUsingOfflineSample
-                    )
-                    1 -> {
-                        val round = state.selectedRound
-                        if (round != null) {
-                            RoundDetailScreen(
-                                round = round,
-                                isLoadingImage = state.isLoadingRoundImage,
-                                viewingImageBytes = state.viewingImageBytes,
-                                onBack = { viewModel.selectRound(null) },
-                                onViewOriginalImage = { viewModel.loadOriginalScorecardImage(round) },
-                                onDismissOriginalImage = { viewModel.dismissOriginalScorecardImage() }
-                            )
-                        } else {
-                            RoundsListScreen(
-                                rounds = state.payload.rounds,
-                                onSelectRound = { viewModel.selectRound(it) }
-                            )
-                        }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            when (selectedTab) {
+                0 -> SummaryScreen(
+                    payload = state.payload,
+                    isRefreshing = state.isLoading,
+                    onRefresh = { viewModel.refreshFromDrive() }
+                )
+                1 -> {
+                    val round = state.selectedRound
+                    if (round != null) {
+                        RoundDetailScreen(
+                            round = round,
+                            isViewerOpen = state.isViewerOpen,
+                            isLoadingImage = state.isLoadingRoundImage,
+                            viewingImageBytes = state.viewingImageBytes,
+                            imageErrorMessage = state.imageErrorMessage,
+                            onBack = { viewModel.selectRound(null) },
+                            onViewOriginalImage = { viewModel.loadOriginalScorecardImage(round) },
+                            onDismissOriginalImage = { viewModel.dismissOriginalScorecardImage() }
+                        )
+                    } else {
+                        RoundsListScreen(
+                            rounds = state.payload.rounds,
+                            onSelectRound = { viewModel.selectRound(it) }
+                        )
                     }
-                    2 -> UploadScreen(
-                        isSignedIn = state.isSignedIn,
-                        selectedImageUri = state.selectedImageUri,
-                        isUploading = state.isUploading,
-                        onSelectImage = { viewModel.selectImage(it) },
-                        onUploadClick = { viewModel.uploadSelectedImage() }
-                    )
-                    3 -> SettingsScreen(
-                        isSignedIn = state.isSignedIn,
-                        accountEmail = state.accountEmail,
-                        accountDisplayName = state.accountDisplayName,
-                        accountPhotoUrl = state.accountPhotoUrl,
-                        lastSyncedAt = state.lastSyncedAt,
-                        onSignInClick = { launchGoogleSignIn() },
-                        onSignOutClick = { launchGoogleSignOut() },
-                        onRefreshClick = { viewModel.refreshFromDrive() }
-                    )
                 }
+                2 -> UploadScreen(
+                    isSignedIn = state.isSignedIn,
+                    selectedImageUri = state.selectedImageUri,
+                    isUploading = state.isUploading,
+                    onSelectImage = { viewModel.selectImage(it) },
+                    onUploadClick = { viewModel.uploadSelectedImage() }
+                )
+                3 -> SettingsScreen(
+                    isSignedIn = state.isSignedIn,
+                    accountEmail = state.accountEmail,
+                    accountDisplayName = state.accountDisplayName,
+                    accountPhotoUrl = state.accountPhotoUrl,
+                    lastSyncedAt = state.lastSyncedAt,
+                    onSignInClick = { launchGoogleSignIn() },
+                    onSignOutClick = { launchGoogleSignOut() },
+                    onRefreshClick = { viewModel.refreshFromDrive() }
+                )
             }
         }
     }
@@ -385,7 +407,8 @@ private fun CompactBottomTabItem(
     label: String,
     modifier: Modifier = Modifier
 ) {
-    val contentColor = if (selected) BrandPrimary else Color(0xFF64748B)
+    val iconColor = if (selected) BrandPrimary else Color(0xFF64748B)
+    val labelColor = if (selected) MintText else Color(0xFF64748B)
     Column(
         modifier = modifier
             .fillMaxHeight()
@@ -409,7 +432,7 @@ private fun CompactBottomTabItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = contentColor,
+                tint = iconColor,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -419,7 +442,7 @@ private fun CompactBottomTabItem(
             fontSize = 11.sp,
             lineHeight = 13.sp,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-            color = contentColor,
+            color = labelColor,
             maxLines = 1
         )
     }

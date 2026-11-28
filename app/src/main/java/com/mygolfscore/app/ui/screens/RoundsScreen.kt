@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,9 +17,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.RotateRight
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PieChart
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,6 +46,7 @@ import com.mygolfscore.app.data.model.HoleScore
 import com.mygolfscore.app.ui.theme.*
 import java.util.Locale
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 @Composable
 fun RoundsListScreen(
@@ -49,8 +55,8 @@ fun RoundsListScreen(
     modifier: Modifier = Modifier,
 ) {
     val years = remember(rounds) {
-        rounds.asSequence().mapNotNull { (_, date) ->
-            val y = date.take(4)
+        rounds.asSequence().mapNotNull { round ->
+            val y = round.date.take(4)
             if ((y.length == 4) && y.all { it.isDigit() }) y else null
         }.distinct().sortedDescending().toList()
     }
@@ -64,7 +70,7 @@ fun RoundsListScreen(
 
     val filteredRounds = remember(rounds, selectedYear) {
         if (selectedYear == "전체") rounds
-        else rounds.filter { (_, date) -> date.startsWith(selectedYear) }
+        else rounds.filter { round -> round.date.startsWith(selectedYear) }
     }
 
     val filterOptions = remember(years) { listOf("전체") + years }
@@ -127,10 +133,11 @@ fun RoundsListScreen(
                 contentPadding = PaddingValues(bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(filteredRounds, key = { (id) -> id }) { round ->
+                items(filteredRounds, key = { round -> round.id }) { round ->
                     RoundSummaryCard(
-                        round = round
-                    ) { onSelectRound(round) }
+                        round = round,
+                        onClick = { onSelectRound(round) }
+                    )
                 }
             }
         }
@@ -233,8 +240,10 @@ private fun RoundSummaryCard(
 @Composable
 fun RoundDetailScreen(
     round: GolfRound,
+    isViewerOpen: Boolean,
     isLoadingImage: Boolean,
     viewingImageBytes: ByteArray?,
+    imageErrorMessage: String?,
     onBack: () -> Unit,
     onViewOriginalImage: () -> Unit,
     onDismissOriginalImage: () -> Unit,
@@ -245,29 +254,63 @@ fun RoundDetailScreen(
             .fillMaxSize()
             .background(GolfSurface)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // 상단 서브 헤더: 좌측 ← 라운드 목록 + 우측 원본 이미지 필 버튼 (v1.0.1)
         Row(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .clickable(onClick = onBack)
-                .padding(vertical = 4.dp, horizontal = 2.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "라운드 목록으로 돌아가기",
-                tint = GolfDarkEmerald,
-                modifier = Modifier.size(18.dp)
-            )
-            Text(
-                text = "라운드 목록",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = GolfDarkEmerald
-            )
+            Row(
+                modifier = Modifier
+                    .heightIn(min = 48.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = onBack)
+                    .padding(horizontal = 4.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "라운드 목록으로 돌아가기",
+                    tint = GolfDarkEmerald,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = "라운드 목록",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = GolfDarkEmerald
+                )
+            }
+
+            if (round.imageFileId.isNotBlank()) {
+                OutlinedButton(
+                    onClick = onViewOriginalImage,
+                    shape = CircleShape,
+                    border = BorderStroke(1.dp, ViewerPillBorder),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = ViewerPillBg,
+                        contentColor = ViewerPillBorder
+                    ),
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                    modifier = Modifier.heightIn(min = 48.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Image,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "원본 이미지",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         }
 
         RoundSummaryCard(round = round)
@@ -297,7 +340,6 @@ fun RoundDetailScreen(
         if (round.imageFileId.isNotBlank()) {
             OutlinedButton(
                 onClick = onViewOriginalImage,
-                enabled = !isLoadingImage,
                 shape = RoundedCornerShape(14.dp),
                 border = BorderStroke(1.dp, BrandPrimary),
                 colors = ButtonDefaults.outlinedButtonColors(
@@ -308,30 +350,27 @@ fun RoundDetailScreen(
                     .fillMaxWidth()
                     .height(48.dp)
             ) {
-                if (isLoadingImage) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
-                        color = BrandPrimary,
-                        strokeWidth = 2.dp
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("원본 이미지 불러오는 중...", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Image,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("원본 스코어카드 이미지 보기", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                }
+                Icon(
+                    imageVector = Icons.Default.Image,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("원본 스코어카드 이미지 보기", fontWeight = FontWeight.Bold, fontSize = 14.sp)
             }
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
     }
 
-    viewingImageBytes?.let {
+    if (isViewerOpen) {
         OriginalImageViewerDialog(
-            imageBytes = it,
+            courseName = round.courseName,
+            roundDate = round.date,
+            isLoading = isLoadingImage,
+            imageBytes = viewingImageBytes,
+            errorMessage = imageErrorMessage,
+            onRetry = onViewOriginalImage,
             onDismiss = onDismissOriginalImage,
         )
     }
@@ -473,7 +512,7 @@ private fun CourseHolesSection(title: String, holes: List<HoleScore>, strokes: I
 
 @Composable
 private fun RoundScoreStatisticsCard(holes: List<HoleScore>) {
-    val validHoles = holes.filter { (_, _, par, strokes) -> (strokes > 0) && (par > 0) }
+    val validHoles = holes.filter { hole -> (hole.strokes > 0) && (hole.par > 0) }
     val totalHoles = max(1, validHoles.size)
     val birdieCount = validHoles.count { it.toPar <= -1 }
     val parCount = validHoles.count { it.toPar == 0 }
@@ -577,74 +616,292 @@ private fun RoundScoreStatisticsCard(holes: List<HoleScore>) {
 
 @Composable
 private fun OriginalImageViewerDialog(
-    imageBytes: ByteArray,
+    courseName: String,
+    roundDate: String,
+    isLoading: Boolean,
+    imageBytes: ByteArray?,
+    errorMessage: String?,
+    onRetry: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val bitmap = remember(imageBytes) {
-        BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)?.asImageBitmap()
+        imageBytes?.let { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() }
     }
-    var scale by remember { mutableFloatStateOf(1f) }
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    var offsetY by remember { mutableFloatStateOf(0f) }
+    var scale by remember(imageBytes) { mutableFloatStateOf(1f) }
+    var offsetX by remember(imageBytes) { mutableFloatStateOf(0f) }
+    var offsetY by remember(imageBytes) { mutableFloatStateOf(0f) }
+    var rotationDegrees by remember(imageBytes) { mutableFloatStateOf(0f) }
+    var showOverlays by remember { mutableStateOf(true) }
 
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.92f))
-                .systemBarsPadding()
+                .background(ViewerBackdrop)
         ) {
-            if (bitmap != null) {
-                Image(
-                    bitmap = bitmap,
-                    contentDescription = "원본 스코어카드 이미지",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .pointerInput(Unit) {
-                            detectTransformGestures { _, pan, zoom, _ ->
-                                val newScale = (scale * zoom).coerceIn(1f, 4f)
-                                scale = newScale
-                                if (newScale > 1f) {
-                                    offsetX += pan.x
-                                    offsetY += pan.y
-                                } else {
-                                    offsetX = 0f
-                                    offsetY = 0f
-                                }
+            when {
+                isLoading -> {
+                    CircularProgressIndicator(
+                        color = BrandPrimary,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                errorMessage != null || bitmap == null -> {
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(horizontal = 24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ErrorOutline,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.8f),
+                            modifier = Modifier.size(44.dp)
+                        )
+                        Text(
+                            text = errorMessage ?: "이미지를 표시할 수 없습니다.",
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Button(
+                                onClick = onRetry,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = BrandPrimary,
+                                    contentColor = Color.White
+                                ),
+                                shape = CircleShape
+                            ) {
+                                Text("다시 시도", fontWeight = FontWeight.Bold)
+                            }
+                            OutlinedButton(
+                                onClick = onDismiss,
+                                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = Color.White
+                                ),
+                                shape = CircleShape
+                            ) {
+                                Text("닫기", fontWeight = FontWeight.SemiBold)
                             }
                         }
-                        .graphicsLayer {
-                            scaleX = scale
-                            scaleY = scale
-                            translationX = offsetX
-                            translationY = offsetY
-                        }
-                )
-            } else {
-                Text(
-                    text = "이미지를 표시할 수 없습니다.",
-                    color = Color.White,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                    }
+                }
+                else -> {
+                    Image(
+                        bitmap = bitmap,
+                        contentDescription = "원본 스코어카드 이미지",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onTap = { showOverlays = !showOverlays },
+                                    onDoubleTap = {
+                                        if (scale > 1.05f) {
+                                            scale = 1f
+                                            offsetX = 0f
+                                            offsetY = 0f
+                                        } else {
+                                            scale = 2f
+                                        }
+                                    }
+                                )
+                            }
+                            .pointerInput(Unit) {
+                                detectTransformGestures { _, pan, zoom, _ ->
+                                    val newScale = (scale * zoom).coerceIn(1f, 4f)
+                                    scale = newScale
+                                    if (newScale > 1f) {
+                                        offsetX += pan.x
+                                        offsetY += pan.y
+                                    } else {
+                                        offsetX = 0f
+                                        offsetY = 0f
+                                    }
+                                }
+                            }
+                            .graphicsLayer {
+                                scaleX = scale
+                                scaleY = scale
+                                translationX = offsetX
+                                translationY = offsetY
+                                rotationZ = rotationDegrees
+                            }
+                    )
+                }
             }
 
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(16.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.18f))
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "닫기",
-                    tint = Color.White
-                )
+            // 상단 오버레이 바
+            if (showOverlays) {
+                Surface(
+                    color = ViewerOverlayBg,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.TopCenter)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .statusBarsPadding()
+                            .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "원본 스코어카드",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = "$courseName · $roundDate",
+                                fontSize = 13.sp,
+                                color = Color.White.copy(alpha = 0.78f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+
+                        IconButton(
+                            onClick = onDismiss,
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.White.copy(alpha = 0.16f))
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "닫기",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 하단 플로팅 컨트롤 바
+            if (showOverlays && !isLoading && errorMessage == null && bitmap != null) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .navigationBarsPadding()
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Surface(
+                        color = ViewerControlBarBg,
+                        shape = CircleShape,
+                        shadowElevation = 6.dp
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    val nextScale = (scale - 0.5f).coerceIn(1f, 4f)
+                                    scale = nextScale
+                                    if (nextScale <= 1f) {
+                                        offsetX = 0f
+                                        offsetY = 0f
+                                    }
+                                },
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Remove,
+                                    contentDescription = "축소",
+                                    tint = Color.White
+                                )
+                            }
+
+                            Surface(
+                                color = ViewerZoomBadgeBg,
+                                shape = CircleShape
+                            ) {
+                                Text(
+                                    text = "${(scale * 100f).roundToInt()}%",
+                                    color = Color.White,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    scale = (scale + 0.5f).coerceIn(1f, 4f)
+                                },
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "확대",
+                                    tint = Color.White
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    rotationDegrees = (rotationDegrees + 90f) % 360f
+                                },
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.RotateRight,
+                                    contentDescription = "90도 회전",
+                                    tint = Color.White
+                                )
+                            }
+
+                            TextButton(
+                                onClick = {
+                                    scale = 1f
+                                    offsetX = 0f
+                                    offsetY = 0f
+                                    rotationDegrees = 0f
+                                },
+                                modifier = Modifier.heightIn(min = 48.dp)
+                            ) {
+                                Text(
+                                    text = "1:1",
+                                    color = Color.White,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "두 손가락으로 확대·이동 · 더블 탭으로 2배 확대",
+                        fontSize = 12.sp,
+                        color = Color.White.copy(alpha = 0.78f),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }

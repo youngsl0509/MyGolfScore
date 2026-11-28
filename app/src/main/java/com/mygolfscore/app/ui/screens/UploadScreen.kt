@@ -73,7 +73,7 @@ fun UploadScreen(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
                 text = "스코어카드 업로드",
@@ -83,7 +83,7 @@ fun UploadScreen(
             )
             IconButton(
                 onClick = { showInfoDialog = true },
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Info,
@@ -130,17 +130,19 @@ fun UploadScreen(
                                 .padding(6.dp)
                         )
                         if (!isUploading) {
-                            Surface(
-                                color = Color.Black.copy(alpha = 0.58f),
-                                shape = CircleShape,
+                            IconButton(
+                                onClick = { onSelectImage(null) },
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
-                                    .padding(10.dp)
-                                    .size(34.dp)
+                                    .padding(4.dp)
+                                    .size(48.dp)
                             ) {
-                                IconButton(
-                                    onClick = { onSelectImage(null) },
-                                    modifier = Modifier.fillMaxSize()
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier
+                                        .size(34.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.Black.copy(alpha = 0.58f))
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
@@ -171,7 +173,7 @@ fun UploadScreen(
                             Text(
                                 text = if (fileSizeText.isNotBlank()) "$fileSizeText · 업로드 준비 완료" else "업로드 준비 완료",
                                 fontSize = 12.sp,
-                                color = BrandPrimary,
+                                color = MintText,
                                 fontWeight = FontWeight.Medium
                             )
                         }
