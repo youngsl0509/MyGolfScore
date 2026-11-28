@@ -311,6 +311,37 @@ class GoogleDriveRepository(private val context: Context) {
         }
     }
 
+
+    suspend fun downloadImageBytes(
+        account: Account,
+        fileId: String
+    ): Result<ByteArray> = withContext(Dispatchers.IO) {
+        try {
+            val downloadUrl = "https://www.googleapis.com/drive/v3/files/$fileId?alt=media"
+            val bytes = executeWithAuthAndRetry(
+                account = account,
+                buildRequest = { token ->
+                    Request.Builder()
+                        .url(downloadUrl)
+                        .addHeader("Authorization", "Bearer $token")
+                        .get()
+                        .build()
+                },
+                parseResponse = { resp ->
+                    if (!resp.isSuccessful) {
+                        error("이미지 불러오기 실패 (${resp.code})")
+                    }
+                    resp.body?.bytes() ?: error("이미지 데이터가 비어 있습니다.")
+                }
+            )
+            Result.success(bytes)
+        } catch (ce: CancellationException) {
+            throw ce
+        } catch (t: Throwable) {
+            Result.failure(t)
+        }
+    }
+
     suspend fun uploadScorecardImage(
         account: Account,
         imageUri: Uri,

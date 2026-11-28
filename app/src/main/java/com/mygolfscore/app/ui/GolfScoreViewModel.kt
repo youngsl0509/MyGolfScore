@@ -19,6 +19,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data class GolfScoreUiState(
     val isSignedIn: Boolean = false,
@@ -33,6 +36,9 @@ data class GolfScoreUiState(
     val selectedImageUri: Uri? = null,
     val statusMessage: String? = null,
     val errorMessage: String? = null,
+    val lastSyncedAt: String? = null,
+    val isLoadingRoundImage: Boolean = false,
+    val viewingImageBytes: ByteArray? = null,
     val authConsentIntent: Intent? = null,
 )
 
@@ -48,6 +54,10 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
     private var uploadJob: Job? = null
     private var authCleanupJob: Job? = null
     private var pendingConsentAction: ConsentPendingAction? = null
+    private var imageJob: Job? = null
+
+    private fun currentFormattedTime(): String =
+        SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
 
     private val _uiState = MutableStateFlow(GolfScoreUiState())
     val uiState: StateFlow<GolfScoreUiState> = _uiState.asStateFlow()
@@ -112,6 +122,9 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
                 selectedRound = null,
                 selectedImageUri = null,
                 errorMessage = null,
+                lastSyncedAt = null,
+                isLoadingRoundImage = false,
+                viewingImageBytes = null,
                 authConsentIntent = null,
                 statusMessage = "로그아웃되었습니다."
             )
@@ -162,6 +175,7 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
                         isLoading = false,
                         isUsingOfflineSample = false,
                         payload = result.payload,
+                        lastSyncedAt = currentFormattedTime(),
                         statusMessage = msg
                     )
                 }
@@ -273,6 +287,37 @@ class GolfScoreViewModel(application: Application) : AndroidViewModel(applicatio
             ConsentPendingAction.UPLOAD -> uploadSelectedImage()
             null -> Unit
         }
+    }
+
+    fun loadOriginalScorecardImage(round: GolfRound) {
+        if (round.imageFileId.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "연결된 원본 스코어카드 이미지가 없습니다.") }
+            return
+        }
+        val account = GoogleSignIn.getLastSignedInAccount(getApplication())?.account
+        if (account == null) {
+            _uiState.update { it.copy(errorMessage = "이미지를 보려면 먼저 로그인해 주세요.") }
+            return
+        }
+        imageJob?.cancel()
+        imageJob = viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingRoundImage = true, errorMessage = null) }
+            val res = repository.downloadImageBytes(account, round.imageFileId)
+            res.onSuccess { bytes ->
+                _uiState.update { it.copy(isLoadingRoundImage = false, viewingImageBytes = bytes) }
+            }.onFailure { err ->
+                if (err is NeedAuthConsentException) {
+                    _uiState.update { it.copy(isLoadingRoundImage = false, authConsentIntent = err.consentIntent) }
+                } else if (err !is CancellationException) {
+                    _uiState.update { it.copy(isLoadingRoundImage = false, errorMessage = err.message ?: "이미지를 불러오지 못했습니다.") }
+                }
+            }
+        }
+    }
+
+    fun dismissOriginalScorecardImage() {
+        imageJob?.cancel()
+        _uiState.update { it.copy(isLoadingRoundImage = false, viewingImageBytes = null) }
     }
 
     fun clearStatusMessage() {

@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.mygolfscore.app.ui.theme
 
 import androidx.compose.material3.MaterialTheme
@@ -5,37 +7,52 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-val GolfDarkEmerald = Color(0xFF0A2E23)
-val GolfGreenDark = Color(0xFF104E3B)
-val GolfGreenMid = Color(0xFF1B6B52)
-val GolfAppIconGreen = Color(0xFF14A665)
-val GolfGreenLight = Color(0xFFE6F4EE)
-val GolfAccent = Color(0xFF10B981)
-val GoldAccent = Color(0xFFF59E0B)
-val GolfSurface = Color(0xFFF3F7F5)
+val BrandPrimary = Color(0xFF14A665)
+val BrandDarkCard = Color(0xFF1B4332)
+val MintTint = Color(0xFFE8F6EF)
+val MintText = Color(0xFF0D6E42)
 
-val BirdiePink = Color(0xFFEC4899)
-val BirdieBg = Color(0xFFFCE7F3)
-val ParGreen = Color(0xFF10B981)
-val ParBg = Color(0xFFD1FAE5)
-val BogeyOrange = Color(0xFFF59E0B)
+val GolfDarkEmerald = Color(0xFF1B3A2D)
+val GolfGreenDark = Color(0xFF0D6E42)
+val GolfGreenMid = Color(0xFF14A665)
+val GolfAppIconGreen = Color(0xFF14A665)
+val GolfGreenLight = Color(0xFFE8F6EF)
+val GolfAccent = Color(0xFF14A665)
+val GoldAccent = Color(0xFFF59E0B)
+val GolfSurface = Color(0xFFF7FAF8)
+
+val NeutralBannerBg = Color(0xFFF2F5F3)
+val TableHeaderBg = Color(0xFFF3F4F6)
+val TextSecondary = Color(0xFF4B5563)
+val TextTertiary = Color(0xFF7A8680)
+val HairlineDivider = Color(0xFFE5E7EB)
+
+val DestructiveRed = Color(0xFFDC2626)
+val DestructiveBorder = Color(0xFFFCA5A5)
+
+// 5-tier Score Semantics
+val BirdieBlue = Color(0xFF2563EB)
+val BirdieBg = Color(0xFFEFF6FF)
+val ParGreen = Color(0xFF14A665)
+val ParBg = Color(0xFFE6F6EE)
+val BogeyAmber = Color(0xFFD97706)
 val BogeyBg = Color(0xFFFEF3C7)
-val DoubleBogeyRed = Color(0xFFEF4444)
-val DoubleBogeyBg = Color(0xFFFEE2E2)
-val TripleRed = Color(0xFF991B1B)
+val DoubleBogeyOrange = Color(0xFFEA580C)
+val DoubleBogeyBg = Color(0xFFFFEDD5)
+val TripleRed = Color(0xFFDC2626)
 val TripleBg = Color(0xFFFEE2E2)
 
 private val GolfColorScheme = lightColorScheme(
-    primary = GolfGreenDark,
+    primary = BrandPrimary,
     onPrimary = Color.White,
-    primaryContainer = GolfGreenLight,
-    onPrimaryContainer = GolfDarkEmerald,
-    secondary = GolfGreenMid,
+    primaryContainer = MintTint,
+    onPrimaryContainer = MintText,
+    secondary = BrandDarkCard,
     onSecondary = Color.White,
-    background = Color.White,
+    background = GolfSurface,
     surface = Color.White,
-    surfaceVariant = Color(0xFFEAEFF0),
-    onSurfaceVariant = Color(0xFF334155)
+    surfaceVariant = TableHeaderBg,
+    onSurfaceVariant = TextSecondary
 )
 
 @Composable

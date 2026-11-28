@@ -16,14 +16,14 @@ data class GolfScorePayload(
 data class DriveFolderConfig(
     val rootFolderId: String = "1_zoAQx3O_ydAIryb6s00z_Bh-gzGbqvz",
     val imageFolderId: String = "1KbhKnGiyqpZUQR3ArsnHxu7JoUg3ZiD6",
-    val jsonFileName: String = "myGolfScore.json"
+    val jsonFileName: String = "myGolfScore.json",
 )
 
 @Serializable
 data class SummarySection(
     val overall: OverallStats = OverallStats(),
     val currentYear: YearlyStats = YearlyStats(),
-    val scoreDistribution: ScoreDistribution = ScoreDistribution()
+    val scoreDistribution: ScoreDistribution = ScoreDistribution(),
 )
 
 @Serializable
@@ -32,7 +32,7 @@ data class OverallStats(
     val avgStrokes: Double = 0.0,
     val avgToPar: Double = 0.0,
     val recent5AvgStrokes: Double = 0.0,
-    val bestScore: Int = 0
+    val bestScore: Int = 0,
 )
 
 @Serializable
@@ -41,7 +41,7 @@ data class YearlyStats(
     val totalRounds: Int = 0,
     val avgStrokes: Double = 0.0,
     val avgToPar: Double = 0.0,
-    val bestScore: Int = 0
+    val bestScore: Int = 0,
 )
 
 @Serializable
@@ -50,7 +50,7 @@ data class ScoreDistribution(
     val par: Int = 0,
     val bogey: Int = 0,
     val doubleBogey: Int = 0,
-    val triplePlus: Int = 0
+    val triplePlus: Int = 0,
 )
 
 @Serializable
@@ -71,7 +71,7 @@ data class GolfRound(
     val imageFileName: String = "",
     val imageFileId: String = "",
     val distribution: ScoreDistribution = ScoreDistribution(),
-    val holes: List<HoleScore> = emptyList()
+    val holes: List<HoleScore> = emptyList(),
 )
 
 @Serializable
@@ -81,5 +81,5 @@ data class HoleScore(
     val par: Int,
     val strokes: Int,
     val toPar: Int,
-    val result: String
+    val result: String,
 )
